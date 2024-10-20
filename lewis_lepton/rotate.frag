@@ -32,7 +32,8 @@ void main() {
 
     // ?coord rotate
     uv -= vec2(0.5);
-    uv = rotate(PI) * uv;
+    uv = rotate(PI*u_time
+    ) * uv;
     uv += vec2(0.5);
 
     // uv *= scale(1.0);

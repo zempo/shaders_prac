@@ -9,12 +9,14 @@ void main(){
     vec2 uv = 6.0 * ((gl_FragCoord.xy - (u_resolution * 0.0)) / u_resolution);
     vec2 translate = vec2(0.0);
 
-    for(int n = 0; n < 8; n++){
+    for(int n = 1; n < 8; n++){
        float i = float(n);
 
-        translate = vec2(0.7 / i * sin(i * uv.y + u_time + 0.3 * i) + 0.8, 0.4 / (i * sin(uv.x + u_time + 0.3) + 1.6));
+        translate = vec2(0.7 / i * sin(i * uv.y + u_time + 0.3 * i) + 0.8, 0.4 / i * sin(uv.x + u_time + 0.3 * i) + 1.6);
         uv += translate;
     }
+    translate = vec2(0.7 / sin(uv.y + u_time + 0.3) + 0.8, 0.4 / sin(uv.x + u_time + 0.3) + 1.6);
+    uv += translate;
 
     vec3 c_1 = vec3(0.5 * sin(uv.x) + 0.5, 0.5 * sin(uv.y) + 0.5, sin(uv.x + uv.y));
     vec3 c_2 = vec3(0.5 * cos(uv.y), 0.5 * sin(uv.y) + 0.5, sin(uv.x + uv.y));
