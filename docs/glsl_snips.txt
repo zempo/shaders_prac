@@ -9,6 +9,38 @@ https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language
 plus various other papers & books
 */
 {
+	/// My Shortcuts
+	"mkclr_uv": {
+		"prefix": "mkclr_uv",
+		"body": "vec3 c_$1 = vec3(uv.x, ${2:alpha_val}, uv.y);$0",
+		"description": "Makes rainbox UV spectrum gradient"
+	},
+	"mkclr": {
+		"prefix": "mkclr",
+		"body": "vec3 c_$1 = vec3($2, $3, $4);$0",
+		"description": "Makes rainbox UV spectrum gradient"
+	},
+	"scale_call": {
+		"prefix": "scale_call",
+		"body": [
+			"uv -= vec2(0.5);",
+			"// uv = scale(vec2(sin(u_time) / 1.0) + 2.0) * uv;",
+			"uv = scale(0.3) * uv;",
+			"uv += vec2(0.5);"
+		],
+		"description": "Call and normalize scale fxn"
+	},
+	"rotate_call": {
+		"prefix": "rotate_call",
+		"body": [
+			"// ?make sure PI is included!!",
+			"// ? Also, rotation happens in Radians",
+			"uv -= vec2(0.5);",
+			"uv = rotate(PI) * uv;",
+			"uv += vec2(0.5);"
+		],
+		"description": "Call and normalize rotate fxn"
+	},
 	///LOOPS
 	"for": {
 		"prefix": "for",
