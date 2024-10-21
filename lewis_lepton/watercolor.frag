@@ -24,7 +24,6 @@ void main(){
     float pct = abs(sin(u_time / 2.0));
     vec3 c_mix = mix(c_2, c_1, pct);
 
-
     // vec3 color = vec3(uv.x, .75, uv.y);
-    gl_FragColor = vec4(c_1, 1.0);
+    gl_FragColor = vec4(c_mix, 1.0);
 }
