@@ -29,6 +29,15 @@ plus various other papers & books
 	"inituv": {
 		"prefix": "inituv",
 		"body": [
+			"vec2 uv = ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);",
+			"vec2 translate = vec2((sin(u_time / 1.0) * 0.25),0.0);",
+			"uv += translate;"
+		],
+		"description": "Initializes a translation setup"
+	},	
+	"inituv": {
+		"prefix": "inituv_1",
+		"body": [
 			"vec2 uv = ((gl_FragCoord.xy - (u_resolution * 0.0)) / u_resolution);",
 			"vec2 translate = vec2((sin(u_time / 1.0) * 0.25),0.0);",
 			"uv += translate;"
