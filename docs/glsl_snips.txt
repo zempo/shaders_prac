@@ -20,6 +20,14 @@ plus various other papers & books
 			"uniform vec2 u_resolution;",
 			"uniform float u_time;",
 			"",
+			"const float PI = 3.14159265359;",
+			"float mkPoly(vec2 position, float radius, float sides){",
+  		"position = position * 2.0 - 1.0;",
+  		"float angle = atan(position.x, position.y);",
+  		"float slice = PI * 2.0 / sides;",
+  		"return step(radius, cos(floor(0.5 + angle / slice) * slice - angle) * length(position));",
+			"}",
+			"",
 			"void main(){",
 			"\t$0",
 			"}"
@@ -35,7 +43,7 @@ plus various other papers & books
 		],
 		"description": "Initializes a translation setup"
 	},	
-	"inituv": {
+	"inituv_1": {
 		"prefix": "inituv_1",
 		"body": [
 			"vec2 uv = ((gl_FragCoord.xy - (u_resolution * 0.0)) / u_resolution);",
@@ -54,6 +62,65 @@ plus various other papers & books
 		"body": "vec3 c_$1 = vec3($2, $3, $4);$0",
 		"description": "Makes rainbox UV spectrum gradient"
 	},
+	"mkpolygon_pattern": {
+		"prefix": "mkpolygon_pattern",
+		"body": [
+			"float freq = $1.0;",
+			"// !mkPoly function needed!",
+			"float p_$2 = mkPoly(fract(uv * freq), $3, $4);",
+			"// mkPoly(fract(uv * freq), size, sides);$0"
+		],
+		"description": "Makes polygon grid pattern"
+	},
+	"mktri_pattern": {
+		"prefix": "mktri_pattern",
+		"body": [
+			"uv.y += 0.8; // !needs vert shift",
+			"float freq = $1;",
+			"float p_$2 = max(",
+			"\tabs(fract(uv.x * freq) * 2.0 - 1.0) + fract(uv.y * freq),",
+			"\tabs(fract(uv.y * freq))",
+			");",
+			"p_$2 = step($3, p_$2);$0"
+		],
+		"description": "Makes triangular grid pattern"
+	},
+	"mksqr_pattern": {
+		"prefix": "mksqr_pattern",
+		"body": [
+			"float freq = $1.0;",
+			"float p_$2 = max(abs(fract(uv.x * freq) * 2.0 - 1.0), abs(fract(uv.y * freq) * 2.0 - 1.0));",
+			"p_$2 = step($3, p_$2);$0",
+			"// step(0.3, p_2);"
+		],
+		"description": "Makes square grid pattern"
+	},
+	"mkcirc_pattern": {
+		"prefix": "mkcirc_pattern",
+		"body": [
+			"float freq = $1.0;",
+			"// distance(uv,radius float); -- pixel to center distance",
+			"float p_$2 = distance(fract(uv * freq), vec2(0.5));",
+			"// float p_$2 = abs(distance(fract(uv * freq), vec2(0.5)) - 0.3); // fat donuts",
+			"// p_$2 = step(0.25, p_$2);",
+			"float circ_step = $3;",
+			"float circ_blur = circ_step + 0.$4;",
+			"p_$2 = smoothstep(circ_step,circ_blur,p_$2);$0"
+		],
+		"description": "Makes circle grid pattern"
+	},
+	"mkring_pattern": {
+		"prefix": "mkring_pattern",
+		"body": [
+			"float freq = $1.0;",
+			"// (abs(length(uv * inner_radius) - radius));",
+			"float p_$2 = abs(distance(fract(uv * freq), vec2(0.5)) - 0.3);",
+			"float ring_step = 0.05;",
+			"float ring_blur = ring_step + 0.1;",
+			"p_$2 = smoothstep(ring_step,ring_blur,p_$2);"
+		],
+		"description": "Makes ring grid pattern"
+	},
 	"scale_call": {
 		"prefix": "scale_call",
 		"body": [
@@ -69,6 +136,7 @@ plus various other papers & books
 		"body": [
 			"// ?make sure PI is included!!",
 			"// ? Also, rotation happens in Radians",
+			"// ! Also, ROTATE before you define pattern",
 			"uv -= vec2(0.5);",
 			"uv = rotate(PI) * uv;",
 			"uv += vec2(0.5);"

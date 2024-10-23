@@ -5,17 +5,16 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-mat2 rotate(float angle){
-  return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-}
-
-
 const float PI = 3.14159265359;
 float mkPoly(vec2 position, float radius, float sides){
   position = position * 2.0 - 1.0;
   float angle = atan(position.x, position.y);
   float slice = PI * 2.0 / sides;
   return step(radius, cos(floor(0.5 + angle / slice) * slice - angle) * length(position));
+}
+
+mat2 rotate(float angle){
+  return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
 }
 
 void main(){
