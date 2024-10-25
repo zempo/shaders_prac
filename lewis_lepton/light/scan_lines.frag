@@ -23,7 +23,9 @@ void main(){
     float alpha2 = sin(floor(size * uv.y * uv.x) + u_time * 5.0 + 1.0 / 2.0); 
 
     alpha += atan(floor(size * uv.y * uv.x) + u_time * 5.0 + 1.0 / 2.0);
-    alpha2 -= atan(floor(size * uv.y * uv.x) + u_time * 5.0 + 1.0 / 2.0);
+    alpha2 += abs(atan(floor(size * uv.y * uv.x) + sin(u_time / 0.25) * 5.0 + 1.0 / 2.0));
+    alpha2 += abs(atan(floor(size * uv.y * uv.x) + sin(u_time / 0.25) * 5.0 + 1.0 / 2.0));
+
 
     vec3 c_1 = vec3(0.6431, 0.9373, 0.0549);
     vec3 c_2 = vec3(0.2392, 0.3451, 0.0275);
@@ -31,5 +33,5 @@ void main(){
     vec4 p_1 = vec4(c_1, alpha);
     vec4 p_2 = vec4(c_2, alpha2);
 
-    gl_FragColor = mix(p_1, p_2, 0.2); 
+    gl_FragColor = mix(p_1, p_2, 0.2);  
 } 
