@@ -46,11 +46,8 @@ float noise(vec3 x) {
 }
 
 void main(){
-    // float zoomV = tan(u_time / 100.0) * 10.0 * 200.0;
-    // zoomV = sin(u_time);
-    // if(zoomV < 200.0 ){
-        // zoomV = 1000.0;
-    // }
+    // https://www.shadertoy.com/view/ldfczS (original)
+    // https://www.shadertoy.com/view/Mcy3WW (fork)
     float zoomV = 700.0;
     vec2 uv = zoomV * ((gl_FragCoord.xy - (u_resolution.xy * 1.0)) / u_resolution.y);
 
