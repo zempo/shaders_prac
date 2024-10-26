@@ -46,12 +46,24 @@ float noise(vec3 x) {
 }
 
 void main(){
-    vec2 uv = 250.0 * ((gl_FragCoord.xy - (u_resolution.xy * 1.0)) / u_resolution.y);
+    // float zoomV = tan(u_time / 100.0) * 10.0 * 200.0;
+    // zoomV = sin(u_time);
+    // if(zoomV < 200.0 ){
+        // zoomV = 1000.0;
+    // }
+    float zoomV = 700.0;
+    vec2 uv = zoomV * ((gl_FragCoord.xy - (u_resolution.xy * 1.0)) / u_resolution.y);
+
+    // vec2 uv = 200.0 * FragColor.xy;
 
     // Generate noise and sinusoidal value based on time
-    float n = noise(vec3(uv * 8.0 / u_resolution.y, 0.1 * u_time));
-    float v = sin(6.28 * 10.0 * n);
+    float n = noise(vec3(uv * 8.0 / u_resolution.y, 0.05 * u_time));
+    float line_amnt = 26.28;
+    float warble = (sin(u_time / 25.0) + 4.0);
+    float v = sin(line_amnt * warble * n);
     float t = u_time;
+
+    float color_seed = tan(u_time) + 5.0; // default rainbow 12.0
     
     // Smooth the value for anti-aliasing
     v = smoothstep(1.0, 0.0, 0.5 * abs(v) / fwidth(v));
@@ -60,7 +72,8 @@ void main(){
     vec4 texColor = texture(iChannel0, (uv + vec2(1.0, sin(t))) / u_resolution);
     FragColor = mix(
         exp(-33.0 / uv.y) * texColor,
-        0.5 + 0.5 * sin(12.0 * n + vec4(0.0, 2.1, -2.1, 0.0)),
+        0.5 + 0.5 * sin(color_seed * n + vec4(0.0, 2.1, -2.1, 0.0)),
         v
     );
+    FragColor += texture( iChannel0, 10.0 * ((gl_FragCoord.xy - (u_resolution.xy * 1.0)) / u_resolution.y) / u_resolution.xy);
 }
