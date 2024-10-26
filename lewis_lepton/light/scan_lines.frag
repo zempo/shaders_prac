@@ -14,7 +14,7 @@ return step(radius, cos(floor(0.5 + angle / slice) * slice - angle) * length(pos
 }
 
 void main(){
-    vec2 uv = ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
+    vec2 uv = 4.0 * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
     // vec2 translate = vec2((sin(u_time / 1.0) * 0.25),0.0);
     // uv += translate;
 
@@ -31,7 +31,7 @@ void main(){
     vec3 c_2 = vec3(0.2392, 0.3451, 0.0275);
 
     vec4 p_1 = vec4(c_1, alpha);
-    vec4 p_2 = vec4(c_2, alpha2);
+    vec4 p_2 = vec4(c_2, alpha2);  
 
     gl_FragColor = mix(p_1, p_2, 0.2);  
 } 

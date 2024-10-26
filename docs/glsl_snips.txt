@@ -13,12 +13,15 @@ plus various other papers & books
 	"initmain": {
 		"prefix": "initmain",
 		"body": [
+			"#version 460",
+			"",
 			"#ifdef GL_ES",
 			"precision mediump float;",
 			"#endif",
 			"",
 			"uniform vec2 u_resolution;",
 			"uniform float u_time;",
+			"out vec4 FragColor;",
 			"",
 			"const float PI = 3.14159265359;",
 			"float mkPoly(vec2 position, float radius, float sides){",
@@ -30,6 +33,8 @@ plus various other papers & books
 			"",
 			"void main(){",
 			"\t$0",
+			"\tvec3 c_1 = vec3(1.0);",
+			"\tFragColor = vec4(c_1, 1.0);",
 			"}"
 		],
 		"description": "Initializes a translation setup"
