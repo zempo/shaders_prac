@@ -70,21 +70,21 @@ plus various other papers & books
 	"mkpolygon_pattern": {
 		"prefix": "mkpolygon_pattern",
 		"body": [
-			"float freq = $1.0;",
+			"float freq$2 = $1.0;",
 			"// !mkPoly function needed!",
-			"float p_$2 = mkPoly(fract(uv * freq), $3, $4);",
-			"// mkPoly(fract(uv * freq), size, sides);$0"
+			"float p_$2 = mkPoly(fract(uv * freq$2), $3, $4);",
+			"// mkPoly(fract(uv * freq$2), size, sides);$0"
 		],
 		"description": "Makes polygon grid pattern"
 	},
-	"mktri_pattern": {
+	"mktri_pattern": { 
 		"prefix": "mktri_pattern",
 		"body": [
 			"uv.y += 0.8; // !needs vert shift",
-			"float freq = $1;",
+			"float freq$2 = $1;",
 			"float p_$2 = max(",
-			"\tabs(fract(uv.x * freq) * 2.0 - 1.0) + fract(uv.y * freq),",
-			"\tabs(fract(uv.y * freq))",
+			"\tabs(fract(uv.x * freq$2) * 2.0 - 1.0) + fract(uv.y * freq$2),",
+			"\tabs(fract(uv.y * freq$2))",
 			");",
 			"p_$2 = step($3, p_$2);$0"
 		],
@@ -93,8 +93,8 @@ plus various other papers & books
 	"mksqr_pattern": {
 		"prefix": "mksqr_pattern",
 		"body": [
-			"float freq = $1.0;",
-			"float p_$2 = max(abs(fract(uv.x * freq) * 2.0 - 1.0), abs(fract(uv.y * freq) * 2.0 - 1.0));",
+			"float freq$2 = $1.0;",
+			"float p_$2 = max(abs(fract(uv.x * freq$2) * 2.0 - 1.0), abs(fract(uv.y * freq$2) * 2.0 - 1.0));",
 			"p_$2 = step($3, p_$2);$0",
 			"// step(0.3, p_2);"
 		],
@@ -103,10 +103,10 @@ plus various other papers & books
 	"mkcirc_pattern": {
 		"prefix": "mkcirc_pattern",
 		"body": [
-			"float freq = $1.0;",
+			"float freq$2 = $1.0;",
 			"// distance(uv,radius float); -- pixel to center distance",
-			"float p_$2 = distance(fract(uv * freq), vec2(0.5));",
-			"// float p_$2 = abs(distance(fract(uv * freq), vec2(0.5)) - 0.3); // fat donuts",
+			"float p_$2 = distance(fract(uv * freq$2), vec2(0.5));",
+			"// float p_$2 = abs(distance(fract(uv * freq$2), vec2(0.5)) - 0.3); // fat donuts",
 			"// p_$2 = step(0.25, p_$2);",
 			"float circ_step = $3;",
 			"float circ_blur = circ_step + 0.$4;",
@@ -117,9 +117,9 @@ plus various other papers & books
 	"mkring_pattern": {
 		"prefix": "mkring_pattern",
 		"body": [
-			"float freq = $1.0;",
+			"float freq$2 = $1.0;",
 			"// (abs(length(uv * inner_radius) - radius));",
-			"float p_$2 = abs(distance(fract(uv * freq), vec2(0.5)) - 0.3);",
+			"float p_$2 = abs(distance(fract(uv * freq$2), vec2(0.5)) - 0.3);",
 			"float ring_step = 0.05;",
 			"float ring_blur = ring_step + 0.1;",
 			"p_$2 = smoothstep(ring_step,ring_blur,p_$2);"

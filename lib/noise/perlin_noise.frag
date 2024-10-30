@@ -6,6 +6,8 @@ precision mediump float;
  
 uniform vec2 u_resolution;
 uniform float u_time;
+out vec4 FragColor;
+
 
 const float PI = 3.14159265359;
 const float PI_2 = PI * 2.0;
@@ -33,6 +35,7 @@ float perlin_part(vec3 inp)
     
     fr = smoothstep(0.0, 1.0, fr);
     
+    // changing to "+ 2.0" makes it glitchy
     float L = fl.x;
     float R = fl.x + 1.0;
     float T = fl.y;
@@ -91,7 +94,9 @@ vec3 colors3[3] = vec3[3](
 
 float perlin(vec3 inp)
 {
+    // int layers = 15;
     int layers = 15;
+    // float mult = 0.85;
     float mult = 0.85;
 
     
@@ -112,7 +117,8 @@ float perlin(vec3 inp)
 
 
 void main(){
-    vec2 uv = ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
+    float ZOOM = 4.5;
+    vec2 uv = ZOOM * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
     // vec2 translate = vec2((sin(u_time / 1.0) * 0.25),0.0);
     // uv += translate;
 
@@ -120,14 +126,18 @@ void main(){
     
     bool PLUS_SHADING = true;
     
-    
-    float r = perlin(vec3(uv * 0.7, u_time * 0.05));
+    /**
+        float r = perlin(vec3(uv * 0.7, u_time * 0.05));
     float g = perlin(vec3(1.0 + uv * 0.7, u_time * 0.05));
     float b = perlin(vec3(2.0 + uv * 0.7, u_time * 0.05));
+    */ 
+    float r = perlin(vec3(uv * 0.7, u_time * 0.05));
+    float g = perlin(vec3(2.0 + uv * 0.7, u_time * 0.05));
+    float b = perlin(vec3(1.0 + uv * 0.7, u_time * 0.05));
     // float d = perlin(vec3(3.0 + uv * 2.0, u_time * 0.07)) * 3.0; 
     float d = PLUS_SHADING ? perlin(vec3(3.0 + uv * 2.0, u_time * 0.07)) * 3.0 : 1.0;
     
     float v = 5.0;
     
-    gl_FragColor = vec4(round(vec3(r, 0.5 * g, b) / d * v) / v, 1.0);
+    FragColor = vec4(round(vec3(r * 2.8, 0.1 * g, b) / d * v) / v, 1.0);
 }
