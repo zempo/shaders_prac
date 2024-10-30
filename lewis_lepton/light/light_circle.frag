@@ -34,8 +34,8 @@ void main(){
     L_1 += 0.1 * 0.1 / length(uv + vec2(radius * cos(rad * u_time), radius * sin(rad * u_time)));
   }
 
-  vec3 c_1 = vec3(0.2078, 0.8157, 0.1529);
-  vec3 c_2 = vec3(0.1765, 0.2588, 0.1765);
+  vec3 c_1 = vec3(0.541, 0.808, 0.0);
+  vec3 c_2 = vec3(0.1843 + clamp(sin(u_time), 0.1, 0.5), 0.2706, 0.0157 + clamp(cos(u_time), 0.1, 0.5));
 
   vec3 c_12 = mix(c_2, c_1, L_1);
 
