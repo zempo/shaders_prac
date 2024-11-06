@@ -20,12 +20,12 @@ vec2 hash(vec2 p) {
 }
 
 float random(vec2 st) {
-    float noise = sin(u_time / 5.0) + cos(u_time / 6.0);
+    float noise = sin(u_time / 5.0) - cos(u_time * 1.02 / 9.0);
     noise *= cos(5.0);
 
     float noise_clamp = clamp(noise, -0.25, 0.25);
 
-    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123 + noise_clamp);
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123 + noise);
 }
 
 // Voronoi distance function
