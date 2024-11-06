@@ -63,8 +63,8 @@ void main(){
     // vec3 c_1 = vec3(0.4235, 0.8235, 0.4235);
     vec3 c_1a = vec3(0.7216, 0.7137, 0.1725);
     vec3 c_1b = vec3(0.2118, 0.7255, 0.5098);
-    float noise_c1 = clamp((sin(u_time / 100.0)), -0.35, 0.15);
-    vec3 c_1 = c_1a / c_1b + noise_c1;
+    float noise_c1 = clamp((sin(u_time / 100.0)), -0.35, 0.35);
+    vec3 c_1 = c_1a / c_1b - noise_c1;
 
     vec3 c_2 = vec3(0.3294, 0.1176, 0.5882);
 
