@@ -65,14 +65,12 @@ void main(){
     vec3 c_1b = vec3(0.1725, 0.7333, 0.3686);
     // float noise_c1 = clamp((sin(u_time / 100.0)), -0.35, 0.35); 
     float noise_c1 = clamp((sin(u_time / 5.5)), -0.05, 0.05);
-
-    // vec3 c_1 = c_1a / c_1b - noise_c1; 
     vec3 c_1 = (c_1a / c_1b); 
-
-
     vec3 c_2 = vec3(0.3294, 0.1176, 0.5882 + noise_c1);
 
     vec3 c_12 = mix(c_1, c_2, d);
 
-    gl_FragColor = vec4(c_12,1.0);
+    vec3 c_basic_voronoi = vec3(d);
+
+    gl_FragColor = vec4(c_basic_voronoi,1.0);
 } 
