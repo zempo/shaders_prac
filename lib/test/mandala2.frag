@@ -37,11 +37,13 @@ void main(){
   for(float i = 0.0; i < 3.0; i++){
     uv = fract(uv * 2.0) - 0.5;
 
-    float p_1 = length(uv) * exp(-length(uv_reset));
     float p_1b = sdMoon( uv, u_time, 0.7, 1.8);
+    float p_1 = length(uv) * exp(-length(uv_reset)) - p_1b;
     float p_2 = length(uv_reset);
 
-    vec3 c_1 = c_palette(p_2 + t_rate, vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.3922, 0.3922, 0.2627), vec3(0.1686, 0.5373, 0.4824));
+    vec3 c_1 = c_palette(
+      p_2 + (i*0.4) + t_rate,
+      vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.3922, 0.3922, 0.2627), vec3(0.1686, 0.5373, 0.4824));
 
     float freq = 8.0;
 
@@ -50,7 +52,8 @@ void main(){
     // p_1 /= p_1b;
 
     // p_1 = smoothstep(0.0, 0.1, p_1);
-    p_1 = 0.02 / p_1;
+    // p_1 = 0.02 / p_1;
+    p_1 = 0.01 / p_1;
     c_out += (p_1) * c_1;
   }
 
