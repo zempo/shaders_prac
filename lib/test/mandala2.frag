@@ -33,12 +33,13 @@ void main(){
   // vec2 translate = vec2((sin(u_time / 1.0) * 0.25),0.0);
   // uv += translate;  
 
-  float t_rate = (u_time * 0.75);
+  float t_rate = (u_time * 0.8);
   for(float i = 0.0; i < 3.0; i++){
     uv = fract(uv * 2.0) - 0.5;
 
     float p_1b = sdMoon( uv, u_time, 0.7, 1.8);
     float p_1 = length(uv) * exp(-length(uv_reset)) - p_1b;
+    // float p_1 = length(uv) * exp(-length(uv_reset));
     float p_2 = length(uv_reset);
 
     vec3 c_1 = c_palette(
