@@ -106,13 +106,10 @@ void main(){
   vec3 c_out8 = (c1*v_p)*sin(c2+t_c);
   vec3 c_out9 = (c2*v_p)*(c2*v);
 
-
-
-
   vec3 c_outs[9] = vec3[9](
     c_out1, c_out2, c_out3, c_out4, c_out5, c_out6, c_out7, c_out8, c_out9
   );
-  int c_idx = int(mod(t_c, 9.0)); // Modulo cycles between 0, 1, 2
+  int c_idx = int(mod(t_c, 9.0)); // Modulo cycles between 0, 1, 2...etc
   vec3 c_out = c_outs[int(c_idx)];
 
   FragColor = vec4( c_out, 1.0 );
