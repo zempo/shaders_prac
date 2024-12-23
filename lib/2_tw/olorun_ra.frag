@@ -35,6 +35,27 @@ float random2d(vec2 coord, float seed){
   return fract(sin(dot(coord.xy, vec2(a, b)) + seed) * c);
 }
 
+// 2D Noise based on Morgan McGuire @morgan3d
+// https://www.shadertoy.com/view/4dS3Wd
+float noise (vec2 st) {
+  vec2 i = floor(st);
+  vec2 f = fract(st);
+
+  // Four corners in 2D of a tile
+  float a = random2d(i, 0.0);
+  float b = random2d(i + vec2(1.0, 0.0), 0.0);
+  float c = random2d(i + vec2(0.0, 1.0), 0.0);
+  float d = random2d(i + vec2(1.0, 1.0), 0.0);
+  // Smooth Interpolation
+
+  // Cubic Hermine Curve.  Same as SmoothStep()
+  vec2 u = f*f*(3.0-2.0*f);
+  // u = smoothstep(0.,1.,f);
+
+  // Mix 4 coorners percentages
+  return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+}
+
 vec3 mk_cp3(vec2 pt, float len, float rate) {
   vec3 c = vec3(0.0);
   for(float i = 0.0; i < len; i++){
@@ -104,6 +125,58 @@ vec3 mk_cp5(vec2 pt, float rate) {
   return c_pal*2.5*.2+cvoronoi(pt*3.*(sin(.15*rate)+1.2))*.5;
 }
 
+float fbm(vec2 pt, float len, float rate) {
+  float v = 0.0;
+  float a = 0.5;
+
+  vec2 shift = vec2(100.0);
+  mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+  for(float i = 0.0; i < len; i++){
+    float dir = mod(i, 2.0) > 0.5 ? 1.0 : -1.0;
+    v += a * noise(pt - 0.05 * dir * rate);
+    pt = rot * pt * 2.0 + shift;
+    a *= 0.5;
+  }
+  return v;
+}
+
+vec3 mk_cp6(vec2 pt, float rate, float p) {
+  vec2 q = vec2(0.0);
+  q.x = fbm(pt + 0.00 * rate, 6.0, rate);
+  q.y = fbm(pt + vec2(1.0), 6.0, rate);
+  vec2 r = vec2(0.0);
+  r.x = fbm(pt + 1.0 * q + vec2(1.7, 1.2) + 0.15 * rate, 6.0, rate);
+  r.y = fbm(pt + 1.0 * q + vec2(8.3, 2.8) + 0.126 * rate, 6.0, rate);
+  float f = fbm(pt + r, 6.0, rate);
+    
+  // DS: hornidev
+  vec3 color = mix(
+    vec3(1.0, 1.0, 1.3),
+    vec3(1.5, 1.0, 1.0),
+    clamp((f * f) * 10.5, 1.2, 15.5)
+  );
+
+  color = mix(
+    color,
+    vec3(0.8549, 0.8549, 0.7137),
+    clamp(length(q), 1.0, 2.0)
+  );
+
+  color = mix(
+    color,
+    vec3(0.5373, 0.2235, 0.0667),
+    clamp(length(r.x), 0.0, 5.0)
+  );
+  vec3 color2 = mix(
+    color,
+    vec3(0.6902, 0.2745, 0.2196),
+    clamp((f * f) * 10.5, 0.0, 1.0)
+  );
+
+  color = (f * f * f * 1.0 + 0.5 * 1.7 * 0.10 + 0.9 * f) * color + (p/3.);
+  return color;
+}
+
 void main(){
   float zoom = 3.0;
   vec2 uv1 = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
@@ -111,6 +184,7 @@ void main(){
   vec2 uv3 = uv1 * 0.35;
   vec2 uv4 = uv1 * 5.0;
   vec2 uv5 = uv1 * 1.0;
+  vec2 uv6 = uv1 * 1.0;
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 
@@ -121,6 +195,7 @@ void main(){
   float rate3 = u_time * 0.01;
   float rate4 = u_time * 1.0;
   float rate5 = u_time * 1.0;
+  float rate6 = u_time * 1.0;
 
   //* Ripples -- if ripple index, run ripple effect
   float duration = 3.;
@@ -151,6 +226,7 @@ void main(){
   uv2 = vec2( uv2.x*rm2.x - uv2.y*rm2.y, uv2.x*rm2.y - uv2.y*rm2.x * dot(uv2,uv2));
   float p1 = abs(l1-2.0)+(cos(2.*(atan(uv1.x,uv1.y))))*0.13;
   float p2 = abs(l2-2.0)+(cos(.5*(atan(uv2.x,uv2.y))))*0.13;
+  float p3 = abs(l2-2.0)+(cos(.15*(atan(uv2.x,uv2.y))))*0.13;
 
   // *Colors
   vec3 c1 = vec3(abs(1.9-p1),1./p1,p1+0.2);
@@ -158,14 +234,16 @@ void main(){
   vec3 c3 = mk_cp3(uv3, 20.0, rate3);
   vec3 c4 = mk_cp4(uv4, 40.0, rate4);
   vec3 c5 = mk_cp5(uv5, rate5);
+  vec3 c6 = mk_cp6(uv6, rate6, p3);
+
+  //  *alphas
+  float a6 = 50.0 - max(pow(100.0 * distance(uv6.x, -1.0), 0.0), pow(2.0 * distance(uv6.y, 0.5), 1.0));
 
   // vec3 c_out = mix(c1, c2, 0.73);
-  vec3 c_out = c5;
+  vec3 c_out = c6;
 
-  //*Alphas
-  float a1 = 1.4;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
-  FragColor = vec4(c_out, 1.0);
+  FragColor = vec4(c_out, 1.0); 
 }

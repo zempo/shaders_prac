@@ -45,6 +45,59 @@ vec3 mk_noise1(vec2 pt, float len, float rate) {
   return vec3(cos(col)*1.,cos(col*200.0)*.51,cos(col*150.0)*2.0);
 }
 
+//  ! coool demonic sun
+float fbm(vec2 pt, float len, float rate) {
+  float v = 0.0;
+  float a = 0.5;
+
+  vec2 shift = vec2(100.0);
+  mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+  for(float i = 0.0; i < len; i++){
+    float dir = mod(i, 2.0) > 0.5 ? 1.0 : -1.0;
+    v += a * noise(pt - 0.05 * dir * rate);
+    pt = rot * pt * 2.0 + shift;
+    a *= 0.5;
+  }
+  return v;
+}
+
+vec3 mk_cp6(vec2 pt, float rate, float p) {
+  vec2 q = vec2(0.0);
+  q.x = fbm(pt + 0.00 * rate, 6.0, rate);
+  q.y = fbm(pt + vec2(1.0), 6.0, rate);
+  vec2 r = vec2(0.0);
+  r.x = fbm(pt + 1.0 * q + vec2(1.7, 1.2) + 0.15 * rate, 6.0, rate);
+  r.y = fbm(pt + 1.0 * q + vec2(8.3, 2.8) + 0.126 * rate, 6.0, rate);
+  float f = fbm(pt + r, 6.0, rate);
+    
+  // DS: hornidev
+  vec3 color = mix(
+    vec3(1.0, 1.0, 2.63),
+    vec3(1.1, 1.0, 1.0),
+    clamp((f * f) * 10.5, 1.2, 15.5)
+  );
+
+  color = mix(
+    color,
+    vec3(0.8549, 0.8549, 0.7137),
+    clamp(length(q), 1.0, 2.0)
+  );
+
+  color = mix(
+    color,
+    vec3(0.5373, 0.2235, 0.0667),
+    clamp(length(r.x), 0.0, 5.0)
+  );
+  vec3 color2 = mix(
+    color,
+    vec3(0.6902, 0.2745, 0.2196),
+    clamp((f * f) * 10.5, 0.0, 1.0)
+  );
+
+  color = (f * f * f * 1.0 + 0.5 * 1.7 * 0.10 + 0.9 * f) * color * color2 + (p/2.5);
+  return color;
+}
+
 void main(){
   float zoom = 1.0;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
