@@ -27,6 +27,11 @@ float circle(vec2 pt, vec2 center, float radius, float line_width, float edge_th
 return result;
 }
 
+float distFromCircle(vec2 p, vec2 center) {
+  vec2 ratio = u_resolution.xy / u_resolution.x;
+  return distance(p*ratio, center*ratio);
+}
+
 float random2d(vec2 coord, float seed){
   const float a = 12.9898;
   const float b = 78.233;
@@ -139,7 +144,7 @@ float fbm(vec2 pt, float len, float rate) {
   }
   return v;
 }
-
+// https://glslsandbox.com/e#109550.0
 vec3 mk_cp6(vec2 pt, float rate, float p) {
   vec2 q = vec2(0.0);
   q.x = fbm(pt + 0.00 * rate, 6.0, rate);
@@ -177,6 +182,104 @@ vec3 mk_cp6(vec2 pt, float rate, float p) {
   return color;
 }
 
+vec3 mk_cp7(vec2 pt, float rate) {
+  float fAmpMod = 0.005; // height of wave
+  float fWaveSpeed = 0.75; // speed of bounce
+  float fSpeed = 0.2; // speed of center beam
+  float k = 5.; // wave iterations 
+
+  vec3 c_a = vec3(0.0, 0.0, 0.0);
+  float c_vert = 0.0;
+
+  vec2 pt_vert = pt;
+  if(pt_vert.x < 0.0){
+    pt_vert.x -= rate * fSpeed;
+  } else {
+    pt_vert.x -= rate * -fSpeed;
+  }
+
+  for(float i = 1.0; i < k; ++i){
+    float t = rate * fWaveSpeed;
+
+    pt_vert.y += sin(pt_vert.x * exp(i) - t) * fAmpMod;
+
+    float fTemp = abs(11.0 / (50.0 * k) / pt_vert.y);
+    c_vert += fTemp;
+    c_a += vec3(fTemp * cos(rate*2.0) * (i * 0.03), fTemp * sin(rate*0.20) * i / k, pow(fTemp, 0.93) * 1.2 * sin(rate*.30));
+    // c_a += vec3(fTemp2 * (i * 0.03), fTemp2 * i / k, pow(fTemp2, 0.93) * 1.2);
+  }
+
+  float ft = fract(rate);
+
+  vec2 vBarDist = abs(pt);
+	
+	if (vBarDist.x < 0.02){
+		vec3 vCol = c_a / ((vBarDist.x / 0.02) + 0.02);
+	
+		float delta = vBarDist.y / 0.2;
+		if (vBarDist.y < 0.2)	{
+			c_a = mix( vCol, c_a, delta );
+		}
+	}
+
+	float fDistance = distFromCircle(pt, vec2(0.0, 0.0));
+	
+
+	if (fDistance < 0.04)
+	{
+		float delta = fDistance / 0.04;
+		c_a += vec3(1.-delta, 1.-delta, 1.0);
+	}
+	
+	if (fDistance < 0.1)
+	{
+		float delta = fDistance / 0.1;
+		c_a += vec3(1.3-delta, 1.2-delta, 1.-delta);
+	}
+
+  // * cool radial
+	float lineTickness = 0.0;
+  float lumaCount = 30.0;
+  float hueCount = 100.0;
+
+  float d = length(pt);
+  float v = mod(d + rate/20.0*pt.x + pt.x/(lumaCount*2.0), pt.x/lumaCount);
+  v = abs(v - pt.x/(lumaCount*2.0)) - lineTickness;
+
+  float angle = acos(pt.y/d) / TAU;
+  if(pt.x>0.0){
+    angle += (0.5-angle)*2.0;
+  }
+  angle += rate/60.0;
+
+  float unit = d * TAU;
+	float a = mod(angle*unit + unit/(hueCount*2.0) , unit/hueCount);
+	a = abs(a - unit/(hueCount*2.0)) - lineTickness;
+	a = clamp(a, 0.0, 1.0);
+
+	angle += .05;
+	float u = 100.0;
+	float r = mod(angle*u + u/(5.0*2.0) , u/3.0);
+	r = abs(r - u/(5.0*2.0)) - 1.0;
+	r = clamp(r, 0.0, 1.0);
+
+	d /= length(pt.xy);
+	v = min(v, a)*d;
+
+	float dr = .2+(sin(rate*1.1)+1.0)/8.0;
+	float dg = .2+(sin(rate*1.2)+1.0)/8.0;
+	float db = .2+(sin(rate*1.4)+1.0)/8.0;  
+
+  vec3 c_b = vec3(v/(r-dr),v/(r+dg),v/(r-db));
+
+  // * circle blinder
+  // float circle(vec2 pt, vec2 center, float radius, float line_width, float edge_thickness){
+  float p7 = circle(pt,vec2(0.0,0.0), .350, .45, 0.1);
+  vec3 c_c = mk_cp6(pt, rate, p7);
+	// ((2.0 * c_a * c_a) - c_b) + 
+  return mix(p7*c_c*0.83, c_a - c_b, 0.021) + (c_a*c_a*0.005 - c_b - c_b);
+}
+
 void main(){
   float zoom = 3.0;
   vec2 uv1 = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
@@ -185,6 +288,7 @@ void main(){
   vec2 uv4 = uv1 * 5.0;
   vec2 uv5 = uv1 * 1.0;
   vec2 uv6 = uv1 * 1.0;
+  vec2 uv7 = uv1 * .20;
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 
@@ -196,6 +300,7 @@ void main(){
   float rate4 = u_time * 1.0;
   float rate5 = u_time * 1.0;
   float rate6 = u_time * 1.0;
+  float rate7 = u_time * 2.0;
 
   //* Ripples -- if ripple index, run ripple effect
   float duration = 3.;
@@ -235,12 +340,16 @@ void main(){
   vec3 c4 = mk_cp4(uv4, 40.0, rate4);
   vec3 c5 = mk_cp5(uv5, rate5);
   vec3 c6 = mk_cp6(uv6, rate6, p3);
+  vec3 c7 = mk_cp7(uv7, rate7);
+  float c7_mask = distFromCircle(uv7, vec2(0.0, 0.0));
+  float delta_mask = c7_mask / 0.21;
 
   //  *alphas
   float a6 = 50.0 - max(pow(100.0 * distance(uv6.x, -1.0), 0.0), pow(2.0 * distance(uv6.y, 0.5), 1.0));
+  float a7 = 1. - delta_mask;
 
   // vec3 c_out = mix(c1, c2, 0.73);
-  vec3 c_out = c6;
+  vec3 c_out = c7;
 
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
