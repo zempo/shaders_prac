@@ -184,9 +184,9 @@ vec3 mk_cp6(vec2 pt, float rate, float p) {
 
 vec3 mk_cp7(vec2 pt, float rate) {
   float fAmpMod = 0.005; // height of wave
-  float fWaveSpeed = 0.75; // speed of bounce
+  float fWaveSpeed = 0.5; // speed of bounce
   float fSpeed = 0.2; // speed of center beam
-  float k = 5.; // wave iterations 
+  float k = 5.5; // wave iterations 
 
   vec3 c_a = vec3(0.0, 0.0, 0.0);
   float c_vert = 0.0;
@@ -294,7 +294,7 @@ void main(){
 
 // to subdivide uv space
   uv1 = fract(uv1 * 2.0) - 0.5;
-  float rate1 = u_time * 0.75;
+  float rate1 = u_time;
   float rate2 = u_time;
   float rate3 = u_time * 0.01;
   float rate4 = u_time * 1.0;

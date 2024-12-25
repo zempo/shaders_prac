@@ -1,0 +1,53 @@
+vec3 twa1_001 (vec2 pt, vec2 st, float rate) {
+  float scale = (u_resolution.y / st.y) - gl_FragCoord.y + 50.0;
+  float ring = 5.0;
+  float radius = u_resolution.x*st.x + gl_FragCoord.x;
+  float gap = scale*0.3;
+
+  float d = length(pt) * 1.0;
+
+	// Create the wiggle
+	d += (sin(pt.y*2.0/scale+u_time)*sin(pt.x*2.0/scale+u_time*.5))*scale * 4.0;
+	
+
+	// Compute the distance to the closest ring
+	float v = mod(d + radius/(ring*3.0), radius/ring);
+	v = abs(v - radius/(ring*2.0));
+
+  v = clamp(v-gap, 0.0, 3.0);
+
+  d /= radius;
+
+  float r_1 = fb(vec3(pt * 0.51, rate));
+  float r_2 = whacky(vec3(pt * 0.0001, rate * 0.1));
+  vec3 m = fract((d-1.0)*vec3(ring*-.5, -ring + r_1, ring*.25*r_2)*0.5);
+
+  return m * v / 2.0;
+}
+
+vec3 twa1_002 (vec2 pt, vec2 st, float rate) {
+  float scale = (u_resolution.y / st.y);
+  float ring = 5.0;
+  float radius = u_resolution.x*st.x;
+  float gap = scale*0.3;
+
+  float d = length(pt) * 1.0;
+
+	// Create the wiggle
+	d += (sin(pt.y*2.0/scale+u_time)*sin(pt.x*2.0/scale+u_time*.5))*scale * 4.0;
+	
+
+	// Compute the distance to the closest ring
+	float v = mod(d + radius/(ring*3.0), radius/ring);
+	v = abs(v - radius/(ring*2.0));
+
+  v = clamp(v-gap, 0.0, 3.0);
+
+  d /= radius;
+
+  float r_1 = fb(vec3(pt * 0.51, rate));
+  float r_2 = whacky(vec3(pt * 0.0001, rate * 0.1));
+  vec3 m = fract((d-1.0)*vec3(ring*-.5, -ring + r_1, ring*.25*r_2)*0.5);
+
+  return m * v / 2.0;
+}

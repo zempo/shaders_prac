@@ -61,6 +61,7 @@ float fbm(vec2 pt, float len, float rate) {
   return v;
 }
 
+// clouds
 vec3 mk_cp6(vec2 pt, float rate, float p) {
   vec2 q = vec2(0.0);
   q.x = fbm(pt + 0.00 * rate, 6.0, rate);
