@@ -64,15 +64,21 @@ float noise (vec2 st) {
 vec3 mk_cp3(vec2 pt, float len, float rate) {
   vec3 c = vec3(0.0);
   for(float i = 0.0; i < len; i++){
-    float t = 0.4 * TAU * i / 30.0 * rate;
-    float x = tan(5.0*t);
-    float y = sin(4.0*t);
-    vec2 uv_out = 0.4 * vec2(x,y);
+    float t = 1. * TAU * i / 30.0 * rate;
+    float x = tan(10.0*t);
+    float y = sin(3.0*t);
+    vec2 uv_out = 1. * vec2(x,y);
     float r = fract(x);
     float g = 0.6 - r;
     c += 0.01 / (length(pt-uv_out)) * vec3(r,g,0.9);
   }
-  return c;
+  vec3 c_dillute = c_palette(
+    pt.x / 10. + (sin(u_time*0.15)*0.15),
+    vec3(0.000, 0.500, 0.500), vec3(0.000, 0.500, 0.500), vec3(0.000, 0.500, 0.333), vec3(0.000, 0.500, 0.667)
+  );
+
+
+  return c + c_dillute;
 }
 
 vec3 mk_cp4(vec2 pt, float len, float rate) {
@@ -284,7 +290,7 @@ void main(){
   float zoom = 3.0;
   vec2 uv1 = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
   vec2 uv2 = uv1 * 1.0;
-  vec2 uv3 = uv1 * 0.35;
+  vec2 uv3 = uv1 * 1.35;
   vec2 uv4 = uv1 * 5.0;
   vec2 uv5 = uv1 * 1.0;
   vec2 uv6 = uv1 * 1.0;
@@ -303,7 +309,7 @@ void main(){
   float rate7 = u_time * 2.0;
 
   //* Ripples -- if ripple index, run ripple effect
-  float duration = 3.;
+  float duration = 20.;
   float delay = 0.0; 
   float total_time = duration + delay;
   float time_in_phase = mod(rate1, total_time);
@@ -349,7 +355,7 @@ void main(){
   float a7 = 1. - delta_mask;
 
   // vec3 c_out = mix(c1, c2, 0.73);
-  vec3 c_out = c7;
+  vec3 c_out = c3;
 
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*

@@ -320,6 +320,20 @@ void main(){
 }
 
 /**
+--- ?? shaders to explore, next
+https://glslsandbox.com/e#109183.1 (torus nuclear reactor)
+https://glslsandbox.com/e#109235.1 (glowing magic runes)
+
+https://glslsandbox.com/e#109353.0 (three waves)
+https://glslsandbox.com/e#109361.0 (colored kalledoscope)
+https://glslsandbox.com/e#109367.0 (window panes?)
+https://glslsandbox.com/e#109309.0 (colored voronoi)
+https://glslsandbox.com/e#109414.0 (circle clock)
+--
+
+
   https://glslsandbox.com/e#109594.0 
  https://glslsandbox.com/e#109408.0
+
+ https://glslsandbox.com/e#109550.0
 **/ 
