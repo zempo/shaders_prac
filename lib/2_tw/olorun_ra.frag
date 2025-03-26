@@ -355,7 +355,7 @@ void main(){
   float a7 = 1. - delta_mask;
 
   // vec3 c_out = mix(c1, c2, 0.73);
-  vec3 c_out = c3;
+  vec3 c_out = c2;
 
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
