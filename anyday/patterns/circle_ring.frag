@@ -23,7 +23,11 @@ void main(){
   // uv += translate;
 
   // rgb % _,_,_
-  float pattern = fract(distance(uv, vec2(0.0)) * (10.0 + sin(u_time / 1.0)));
+  // ??? perm 1
+  // float pattern = fract(distance(uv, vec2(0.0)) * (10.0 + sin(u_time / 1.0)));
+  // float pattern2 = fract(max(abs(uv.x), abs(uv.y)) * (15.0 + sin(u_time / 2.0)));
+  // ??? perm 2
+  float pattern = fract(distance(uv, vec2(0.0)) * (10.0 + cos(u_time / 1.0)));
   float pattern2 = fract(max(abs(uv.x), abs(uv.y)) * (15.0 + sin(u_time / 2.0)));
 
     // pattern -= vec2(0.5);
