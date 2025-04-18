@@ -35,7 +35,7 @@ void main(){
   vec2 uv0 = uv;
   float x0 = uv0.x;
   float y0 = uv0.y;
-  uv = fract(uv * 2.0) - 0.5;
+  uv = fract(uv * 4.0 + step(sin(u_time), 2.0)) - 0.5;
   float x = uv.x;
   float y = uv.y;
   float spiral_factor = .25 * 5.0;
@@ -49,6 +49,7 @@ void main(){
 
 // to subdivide uv space
   float rate = u_time * 1.0;
+  float rate2 = u_time / 1.0;
   
   vec3 c1 = vec3(1.0);
   // vec3 c_out = vec3(1.0);
@@ -56,11 +57,13 @@ void main(){
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
 
-  float line1 = step(0. + sin(u_time / 1.25), uv.x); // Vertical line at x=0
-  float line2 = step(0. + cos(u_time / 1.25), uv.y); // Vertical line at x=0
+  float line1 = step(0. + sin(u_time / 1.), uv.x); // Vertical line at x=0
+  float line2 = step(0. + cos(u_time / 1.5), uv.y); // Vertical line at x=0
+  float line3 = step(0. + cos(u_time / 1.), uv.y * uv.x); // Vertical line at x=0
   // gl_FragColor = vec4(vec3(line), 1.0);
-  float clamp1 = clamp(p1 * pow(sin(u_time), 2),0.2,0.7);
-  vec3 c_out = vec3(line2 * 0.2, clamp1, clamp1) + vec3(line1 * 0.8, uv.x * pow(sin(u_time), 2), uv.x / pow(sin(u_time * 0.5), 2));
+  float clamp1 = clamp(p1 * pow(sin(rate2), 2),0.2,0.7);
+  float clamp2 = clamp(p0 * pow(sin(rate2), 2),0.2,0.7);
+  vec3 c_out = vec3(line2 * 0.2, clamp1, clamp1) + vec3(line1 * 0.8, uv.x * pow(sin(rate2), 2), uv.x / pow(sin(rate2 * 0.5), 2)) + vec3(line3 * 0.5, uv.y * pow(sin(rate2), 2), uv.y / pow(sin(rate2 * 0.5), 2));
 
   FragColor = vec4(c_out, 1.0);
 }
