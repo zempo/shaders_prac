@@ -6,6 +6,7 @@ precision mediump float;
 
 uniform vec2 u_resolution;
 uniform float u_time;
+uniform vec2 u_mouse; // Mouse position in pixels
 //uniform sampler2D u_tex;
 out vec4 FragColor;
 
@@ -30,39 +31,26 @@ return result;
 void main(){
   float zoom = 1.0;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
+  vec2 mouseNorm = u_mouse / u_resolution;
+  float mX = mouseNorm.x * 2.0 - 1.0;
+  float mY = mouseNorm.x * 2.0 - 1.0;
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 
 // to subdivide uv space
-  //uv = fract(uv * 2.0) - 0.5;
+  // uv = fract(uv * 2.0) - 0.5;
   float rate = u_time * 1.0;
-  float rate1 = u_time * 0.5;
-  vec3 c1 = vec3(1.0);
-  vec3 c_out = vec3(1.0);
-  //glslViewer -l FILE.frag texture.png 
+  float rate1 = u_time * .1;
+  
+float reaction = sin(uv.x * 30.0 + u_time) * sin(uv.y * 30.0);  
+float diffusion = smoothstep(-0.2, 0.2 + sin(uv.x * 3.0 + u_time), reaction); 
+
+  // vec3 c_out = mix(c1, , );
+  vec3 c1 = vec3(diffusion * abs(mX) - (mY/2.0), reaction, diffusion * abs(mY));
+  vec3 c2 = vec3(reaction * abs(mX) - (mY/5.0), diffusion, reaction * abs(mY));
+  vec3 c_out = mix(c1, c2, sin(uv.x * 3.0 + u_time));
+  //glslViewer -l FILE.frag texture.png  
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
-  vec2 gridUV = fract(uv * vec2(4.0,4.)); // Tile 10x10
-  //float movingX = step(0.8, gridUV.x + sin(pow(u_time + gridUV.y * 3.0,gridUV.x)) * 0.2);
-  //float movingY = step(0.8, gridUV.y + cos(u_time + gridUV.x * 2.0) * 0.2);
-  float movingX = step(0.8, gridUV.x + sin(pow(u_time + gridUV.y * 3.0,gridUV.x)) * 0.2);
-  float movingY = step(0.8, gridUV.y + exp(cos(u_time + gridUV.x * 2.)) * 0.2);
-  float squares = max(movingX, movingY);
-  // step(0.3, p_2);
-
-  vec3 c2 = c_palette(
-    sin(movingX) + gridUV.x,
-    vec3(0.0902, 0.149, 0.5098),vec3(0.149, 0.251, 0.5294),vec3(0.2235, 0.3922, 0.4706),vec3(0.8471, 0.8706, 0.8667)
-  ); // blue
-  vec3 c3 = c_palette(
-    squares + gridUV.y - (sin(rate1)*0.25),
-    vec3(1.0,1.0,1.0),vec3(0.7451, 0.7412, 0.7412),vec3(0.7608, 0.7569, 0.7569),vec3(0.0,0.10,0.20)
-  );
-  vec3 c3b = c_palette(
-    uv.x,
-    vec3(0.7529, 0.9412, 0.9176),vec3(0.5373, 0.9294, 0.851),vec3(0.2118, 0.8353, 0.9608),vec3(0.2314, 0.0196, 1.0)
-  );
-  vec3 cm23 = mix(c2, c3 + (sin(rate1)*0.5) * uv.x, squares);
-
-  FragColor = vec4(cm23, 1.0);
+  FragColor = vec4(c_out, 1.0);
 }
