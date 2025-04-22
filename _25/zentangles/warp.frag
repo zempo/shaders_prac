@@ -77,8 +77,11 @@ void main(){
   // vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -20.), .1, pow(uv.y * uv.x, -20.));
   // uv_c1 -= vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -1.), pow(uv.y * uv.x, -1.), pow(uv.y * uv.x, -2.));
   // ?? diagonal perm
-  vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(.2, pow(uv.x, -2.), pow(uv.y * uv.x, -20.));
-  uv_c1 -= vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -1.), pow(uv.y * uv.x, -1.), pow(uv.y * uv.x, -1.));
+  // vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(.2, pow(uv.x, -2.), pow(uv.y * uv.x, -20.));
+  // uv_c1 -= vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -1.), pow(uv.y * uv.x, -1.), pow(uv.y * uv.x, -1.));
+  // ?? bw perm
+  vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -100.), pow(uv.x, -100.), pow(uv.x, -100.));
+  // uv_c1 -= vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -1.), pow(uv.y * uv.x, -1.), pow(uv.y * uv.x, -1.));
   // vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate);
   // uv_c1 = fract(uv_c1 * 2.0) - 0.5;
   coswarp(uv_c1, 3.0);
