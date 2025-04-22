@@ -65,14 +65,20 @@ void main(){
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
   uv = fract(uv * 3.);
-  uvRipple(uv, 5.51, rate);
+  uvRipple(uv, 1.51, rate);
 // to subdivide uv space
 //  rbg blog (regular, black n yellow, intense negative)
   // vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate);
-  vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(.1, uv.x, uv.x);
+  // vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(.1, uv.x, uv.x);
   // vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -2.), pow(uv.y * uv.x, -1.), uv.y);
   // vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, 2.), pow(uv.y * uv.x, -20.), pow(uv.y * uv.x, 2.));
+
+  // ?? pink perm
   // vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -20.), .1, pow(uv.y * uv.x, -20.));
+  // uv_c1 -= vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -1.), pow(uv.y * uv.x, -1.), pow(uv.y * uv.x, -2.));
+  // ?? pink perm
+  vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate) * vec3(.2, pow(uv.x, -2.), pow(uv.y * uv.x, -20.));
+  uv_c1 -= vec3(uv, 0.0) * vec3(rate) * vec3(pow(uv.x, -1.), pow(uv.y * uv.x, -1.), pow(uv.y * uv.x, -1.));
   // vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate);
   // uv_c1 = fract(uv_c1 * 2.0) - 0.5;
   coswarp(uv_c1, 3.0);

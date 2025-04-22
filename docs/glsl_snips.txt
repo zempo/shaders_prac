@@ -21,7 +21,73 @@ plus various other papers & books
 			"",
 			"uniform vec2 u_resolution;",
 			"uniform float u_time;",
+			"//uniform sampler2D u_tex;",
 			"out vec4 FragColor;",
+			"",
+			"const float PI = 3.1415926535897932384626433832795;",
+			"const float TAU = PI * 2.;",
+			"const float E = 2.71828182845904523536028747135266;",
+			"// http://dev.thi.ng/gradients/",
+			"vec3 c_palette( float t, vec3 a, vec3 b, vec3 c, vec3 d) {",
+			"\treturn a + b * cos(TAU * (c * t + d));",
+			"}",
+			"",
+			"float line(float x, float y, float line_width, float edge_width){",
+			"\treturn smoothstep(x-line_width/2.0-edge_width, x-line_width/2.0, y) - smoothstep(x+line_width/2.0, x+line_width/2.0+edge_width, y);",
+			"}",
+			"",
+			"float circle(vec2 pt, vec2 center, float radius, float line_width, float edge_thickness){",
+			"\tpt -= center;",
+			"\tfloat len = length(pt);",
+			"\tfloat result = smoothstep(radius-line_width/2.0-edge_thickness, radius-line_width/2.0, len) - smoothstep(radius + line_width/2.0, radius + line_width/2.0 + edge_thickness, len);",
+			"return result;",
+			"}",
+			"",
+			"// ?? usage: vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate);",
+			"// ?? usage: coswarp(uv_c1, 3.0);",
+			"void coswarp(inout vec3 trip, float warpsScale ){",
+			"\ttrip.xyz += warpsScale * .1 * cos(3. * trip.yzx + (u_time * .25));",
+			"\ttrip.xyz += warpsScale * .05 * cos(11. * trip.yzx + (u_time * .25));",
+			"\ttrip.xyz += warpsScale * .025 * cos(17. * trip.yzx + (u_time * .25));",
+			"}",
+			"",
+			"void uvRipple(inout vec2 uv, float intensity, float rate){",
+			"\tvec2 p = uv -.5;",
+			"\tfloat cLength=length(p);",
+			"uv = uv +(p/cLength)*cos(cLength*15.0-rate*.5)*intensity;",
+			"}", 
+			"",
+			"void main(){",
+			"\tfloat zoom = 1.0;",
+			"\tvec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);",
+			"\t//for textures, use below",
+			"\t// vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);",
+			"",
+			"// to subdivide uv space",
+			"\t//uv = fract(uv * 2.0) - 0.5;",
+			"\tfloat rate = u_time * 1.0;",
+			"\t$0",
+			"\tvec3 c1 = vec3(1.0);",
+			"\tvec3 c_out = vec3(1.0);",
+			"\t//glslViewer -l FILE.frag texture.png ",
+			"\t// or... glslViewer shader.frag textures/*",
+			"\t//FragColor = texture2D(u_tex, uv);",
+			"\tFragColor = vec4(c_out, 1.0);",
+			"}"
+		],
+		"description": "Initializes a translation setup"
+	},	
+	"initmain_old": {
+		"prefix": "initmain_old",
+		"body": [
+			"#version 460",
+			"",
+			"#ifdef GL_ES",
+			"precision mediump float;",
+			"#endif",
+			"",
+			"uniform vec2 u_resolution;",
+			"uniform float u_time;",
 			"",
 			"const float PI = 3.14159265359;",
 			"float mkPoly(vec2 position, float radius, float sides){",
@@ -32,9 +98,11 @@ plus various other papers & books
 			"}",
 			"",
 			"void main(){",
+			"\tfloat zoom = 1.0;",
+			"\tvec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);",
 			"\t$0",
 			"\tvec3 c_1 = vec3(1.0);",
-			"\tFragColor = vec4(c_1, 1.0);",
+			"\tgl_FragColor = vec4(c_1, 1.0);",
 			"}"
 		],
 		"description": "Initializes a translation setup"
@@ -42,9 +110,10 @@ plus various other papers & books
 	"inituv": {
 		"prefix": "inituv",
 		"body": [
-			"vec2 uv = ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);",
-			"vec2 translate = vec2((sin(u_time / 1.0) * 0.25),0.0);",
-			"uv += translate;"
+			"float zoom = 1.0;",
+			"vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);",
+			"// vec2 translate = vec2((sin(u_time / 1.0) * 0.25),0.0);",
+			"// uv += translate;"
 		],
 		"description": "Initializes a translation setup"
 	},	
@@ -57,6 +126,28 @@ plus various other papers & books
 		],
 		"description": "Initializes a translation setup"
 	},	
+	"mkarr_vec3": {
+		"prefix": "mkarr_vec3",
+		"body": [
+		"vec3 a$1[$2] = vec3[$2](",
+		"$3",
+		");",
+		"int a$1_idx = int(mod(u_time, $2.0)); // Modulo cycles between 0, 1, 2...etc over time",
+		"vec3 a_out$1 = a$1[int(a$1_idx)];",
+		],
+		"description": "Makes array of textures/colors"
+	},
+	"mkarr_float": {
+		"prefix": "mkarr_float",
+		"body": [
+		"float a$1[$2] = float[$2](",
+		"$3",
+		");",
+		"int a$1_idx = int(mod(u_time, $2.0)); // Modulo cycles between 0, 1, 2...etc over time",
+		"float a_out$1 = a$1[int(a$1_idx)];",
+		],
+		"description": "Makes array of floats"
+	},
 	"mkclr_uv": {
 		"prefix": "mkclr_uv",
 		"body": "vec3 c_$1 = vec3(uv.x, ${2:alpha_val}, uv.y);$0",
@@ -152,8 +243,18 @@ plus various other papers & books
 	"for": {
 		"prefix": "for",
 		"body": [
-			"for(int $2 = 0; $2 < $3; $2++){",
-				"\t",
+			"for(int $1 = 0; $1 < $2; $1++){",
+				"\tfloat curr_$1 = float($1);",
+				"\t$3",
+			"}"
+		],
+		"description": "for( ; ; ){\n\t//code\n}\n\nThe keyword for is used to describe a loop that is controlled by a counter. The parentheses enclose three expressions that initialize, check and update the variable used as counter. The body defined by curly braces encloses the statements that are executed at each pass of the loop.\n\nfor(int i = 0; i <= 99; i++){\n\taFunction();\n}\n\nThe execution of a single pass or the whole loop can be aborted by using a continue or a break statement respectively."
+	},
+	"for_float": {
+		"prefix": "for_float",
+		"body": [
+			"for(float $1 = 0.0; $1 < $2; $1++){",
+				"\t$3",
 			"}"
 		],
 		"description": "for( ; ; ){\n\t//code\n}\n\nThe keyword for is used to describe a loop that is controlled by a counter. The parentheses enclose three expressions that initialize, check and update the variable used as counter. The body defined by curly braces encloses the statements that are executed at each pass of the loop.\n\nfor(int i = 0; i <= 99; i++){\n\taFunction();\n}\n\nThe execution of a single pass or the whole loop can be aborted by using a continue or a break statement respectively."
@@ -767,13 +868,41 @@ plus various other papers & books
 	"random2d": {
 		"prefix": "random2d",
 		"body": [
-			"float random2d(vec2 coord){",
-			"\treturn fract(sin(dot(coord.xy, vec2(12.9898, 78.233))) * 43758.5453);",
+			"float random2d(vec2 coord, float seed){",
+			"\tconst float a = 12.9898;",
+			"\tconst float b = 78.233;",
+			"\tconst float c = 43758.543123;",
+			"",
+			"\treturn fract(sin(dot(coord.xy, vec2(a, b)) + seed) * c);",
 			"}"
 		],
 		"description": "random 2d function"
 	},
-
+	"noise": {
+		"prefix": "noise",
+		"body": [
+			"// 2D Noise based on Morgan McGuire @morgan3d",
+			"// https://www.shadertoy.com/view/4dS3Wd",
+			"float noise (vec2 st) {",
+			"\tvec2 i = floor(st);",
+			"\tvec2 f = fract(st);",
+			"",
+			"\t// Four corners in 2D of a tile",
+			"\tfloat a = random2d(i, 0.0);",
+			"\tfloat b = random2d(i + vec2(1.0, 0.0), 0.0);",
+			"\tfloat c = random2d(i + vec2(0.0, 1.0), 0.0);",
+			"\tfloat d = random2d(i + vec2(1.0, 1.0), 0.0);",
+			"\t// Smooth Interpolation",
+			"",
+			"\t// Cubic Hermine Curve.  Same as SmoothStep()",
+			"\tvec2 u = f*f*(3.0-2.0*f);",
+			"\t// u = smoothstep(0.,1.,f);",
+			"",
+			"\t// Mix 4 coorners percentages",
+			"\treturn mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;",
+			"}",
+		]
+	},
 	"noise1d": {
 		"prefix": "noise1d",
 		"body": [
@@ -783,7 +912,6 @@ plus various other papers & books
 		],
 		"description": "noise1d function"
 	},
-
 	"simple setup": {
 		"prefix": "simple setup",
 		"body": [
@@ -851,6 +979,37 @@ plus various other papers & books
 		"description": "scale"
 	},
 
+	"rotate_by_pt": {
+		"prefix": "rotate_by_pt",
+		"body": [
+			"/**",
+  		"\tuv -= vec2(0.5);",
+  		"\tuv = rotate(uv, u_time, 2.0 / 1.5);",
+  		"\tuv += vec2(0.5);",
+			"*/ ",
+			"vec2 rotate(vec2 pt, float theta, float aspect){",
+			"\tfloat c = cos(theta);",
+			"\tfloat s = sin(theta);",
+			"\tmat2 mat = mat2(c,s,-s,c);",
+			"\tpt.y /= aspect;",
+			"\tpt = mat * pt;",
+			"\tpt.y *= aspect;",
+			"\treturn pt;",
+			"}",
+			"",
+			"/**",
+  		"\tvec3 t1 = texture2D(u_tex, uv).rgb;",
+  		"\tvec3 c1 = vec3(0.4, 0.3686, 0.3373); // backgrond",
+  		"\tfloat t_adjust = inRect(uv, vec2(0.0),vec2(1.0));",
+			"\tvec3 c_out = mix(c1, t1 - t2 * 0.25, t_adjust);",
+			"*/ ",
+			"float inRect (vec2 pt, vec2 btmL, vec2 topR) {",
+  		"\tvec2 s = step(btmL, pt) - step(topR, pt);",
+  		"\treturn s.x * s.y;",
+			"}"
+		],
+		"description": "rotate by uv"
+	},
 	"rotate": {
 		"prefix": "rotate",
 		"body": [
