@@ -81,11 +81,41 @@ void main(){
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 
 // to subdivide uv space
-  //uv = fract(uv * 2.0) - 0.5;
-  float rate = u_time * 1.0;
-  
-  vec3 c1 = vec3(1.0);
-  vec3 c_out = vec3(1.0);
+  // uv = fract(uv * 4.0) - 0.5;
+  uv = fract(uv * 2.0) - .5;
+  // float rate = sin(pow(u_time * 1.0,-2.0) + u_time);
+  float rate0 = u_time * .5;
+  float rate = pow(u_time,E * .35);
+  float rate2 = u_time * .005;
+  float segments = 1.0 * (TAU + 2.0 + (TAU * sin(rate)));
+  // uv = modPolar((uv * 2.), segments);
+
+  // ?? perm 1: rbg bloom
+  // vec3 cp1 = c_palette(
+  //   rate + uv.y - uv.x,
+  //   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.3922, 0.3922, 0.2627), vec3(0.1686, 0.5373, 0.4824));
+
+  // ?? perm 2: tie dye flower
+    // uv = modPolar((uv * rate2), segments);
+    // vec3 cp1 = c_palette(
+    // (rate * .001) * uv.x,
+    // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.3922, 0.3922, 0.2627), vec3(0.1686, 0.5373, 0.4824));
+
+  // ?? perm 3: tie dye flower
+    segments = 1.0 * (TAU + 10.0 + (TAU * sin(rate)));
+    uv = modPolar((uv * 2.0), segments);
+    // vec3 cp1 = c_palette(
+    // uv.x + uv.y + rate,
+    // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+
+    // ?? perm 4: candy cane + floral petals (includes riplle)
+    uvRipple(uv, 1.51, rate);
+    vec3 cp1 = vec3(uv.x, 0.0, uv.y) * vec3(rate) + vec3(pow(uv.x, 2.), pow(uv.y * uv.x, -20.), pow(uv.y * uv.x, 2.));
+
+
+  // vec3 c1 = vec3(uv.x, uv.y, uv.x);
+  vec3 c1 = cp1;
+  vec3 c_out = c1;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
