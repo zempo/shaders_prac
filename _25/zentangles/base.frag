@@ -54,11 +54,6 @@ float smoothMod(float x, float y, float e){
     a = smoothMod(a,angle,033323231231561.9) - angle/2.;
     //a = mix(a,)
     vec2 p2 = vec2(cos(a), sin(a))*r;
-   
- 
-   
-  
-
     return p2;
 }
 
