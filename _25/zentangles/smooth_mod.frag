@@ -102,15 +102,42 @@ void main(){
     // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.3922, 0.3922, 0.2627), vec3(0.1686, 0.5373, 0.4824));
 
   // ?? perm 3: tie dye flower
-    segments = 1.0 * (TAU + 10.0 + (TAU * sin(rate)));
-    uv = modPolar((uv * 2.0), segments);
+    // segments = 1.0 * (TAU + 10.0 + (TAU * sin(rate)));
+    // uv = modPolar((uv * 2.0), segments);
     // vec3 cp1 = c_palette(
     // uv.x + uv.y + rate,
     // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
 
-    // ?? perm 4: candy cane + floral petals (includes riplle)
+    // ?? perm 4: candy cane + floral petals (includes ripple)
+    //     segments = 1.0 * (TAU + 2.0 + (TAU * sin(rate)));
+    // uv = modPolar((uv * 2.0), segments);
+    // uvRipple(uv, 1.51, rate);
+    // vec3 cp1 = vec3(uv.x, 0.0, uv.y) * vec3(rate) + vec3(pow(uv.x, 2.), pow(uv.y * uv.x, -20.), pow(uv.y * uv.x, 2.));
+    // ?? perm 5: psychadelic neuron
+    //     segments = 1.0 * (TAU + 6.0 + (TAU * sin(rate)));
+    // uv = modPolar((uv * 1.0), segments);
+    // uvRipple(uv, 1.51, rate);
+    // vec3 cp1 = c_palette(
+    // rate + uv.y - uv.x,
+    // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+    // ?? perm 5: psychadelic neuron sillouette
+    // **** and sub-perms!!!!
+        segments = 1.0 * (TAU + 6.0 + (TAU * sin(rate)));
+    uv = modPolar((uv * 1.0), segments);
     uvRipple(uv, 1.51, rate);
-    vec3 cp1 = vec3(uv.x, 0.0, uv.y) * vec3(rate) + vec3(pow(uv.x, 2.), pow(uv.y * uv.x, -20.), pow(uv.y * uv.x, 2.));
+    // vec3 cp1 = c_palette(
+    // rate + uv.y - uv.x,
+    // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(rate, uv.x, pow(uv.x * uv.y, 200.0));
+    // !!!!! best perm so far
+    vec3 cp1 = c_palette(
+    rate + uv.y - uv.x,
+    vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(pow(uv.y, -2.0), rate, uv.y);
+    // vec3 cp1 = c_palette(
+    // rate + uv.y - uv.x,
+    // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(rate + pow(uv.x * uv.y, -2.0), pow(uv.x * uv.y, -2.0), pow(uv.x * uv.y, 200.0));
+    // vec3 cp1 = c_palette(
+    // rate + uv.y - uv.x,
+    // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(rate + pow(uv.x * uv.y, -2.0), pow(uv.x * uv.y, -2.0), pow(uv.x * uv.y, 200.0));
 
 
   // vec3 c1 = vec3(uv.x, uv.y, uv.x);
