@@ -110,7 +110,7 @@ void main(){
   //  c3,c2,c1,c2,c2,c1
   // );
   vec3 a1[6] = vec3[6](
-   c5,c5,c5,c5,c5,c5
+   c1,c2,c3,c5,c5,c5
   );
   int a1_idx = int(mod(rate0 / TAU, 6.0)); // Modulo cycles between 0, 1, 2...etc over time
   vec3 a_out1 = a1[int(a1_idx)];
