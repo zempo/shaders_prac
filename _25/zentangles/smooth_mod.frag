@@ -82,10 +82,10 @@ void main(){
 
 // to subdivide uv space
   // uv = fract(uv * 4.0) - 0.5;
-  uv = fract(uv * 2.0) - .5;
+  // uv = fract(uv * 2.0) - .5;
   // float rate = sin(pow(u_time * 1.0,-2.0) + u_time);
   float rate0 = u_time * .5;
-  float rate = pow(u_time,E * .35);
+  float rate = pow(u_time,E * .33);
   float rate2 = u_time * .005;
   float segments = 1.0 * (TAU + 2.0 + (TAU * sin(rate)));
   // uv = modPolar((uv * 2.), segments);
@@ -125,13 +125,19 @@ void main(){
         segments = 1.0 * (TAU + 6.0 + (TAU * sin(rate)));
     uv = modPolar((uv * 1.0), segments);
     uvRipple(uv, 1.51, rate);
+
     // vec3 cp1 = c_palette(
     // rate + uv.y - uv.x,
     // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(rate, uv.x, pow(uv.x * uv.y, 200.0));
-    // !!!!! best perm so far
+    // ***** best perms so far
+    // vec3 cp1 = c_palette(
+    // rate + uv.y - uv.x,
+    // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(pow(uv.y, -2.0), rate, uv.y);
     vec3 cp1 = c_palette(
     rate + uv.y - uv.x,
-    vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(pow(uv.y, -2.0), rate, uv.y);
+    vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(pow(uv.x * uv.x, 10.0), pow(uv.y * uv.x, -20.0), rate);
+
+
     // vec3 cp1 = c_palette(
     // rate + uv.y - uv.x,
     // vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(rate + pow(uv.x * uv.y, -2.0), pow(uv.x * uv.y, -2.0), pow(uv.x * uv.y, 200.0));

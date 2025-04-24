@@ -87,6 +87,28 @@ float easedTime(float u_time, float duration, int easeType, bool loop) {
     return applyEasing(t, easeType);
 }
 
+/**
+float progress = easedTime(u_time, 3.0, 2, true); // 3 second loop with easeInOutSine
+
+float progress = easedTime(u_time, 2.0, 1, false); // 2 second easeOutSine, stops at end
+
+float x = applyEasing(0.7, 4); // Get eased value at 70% progress with easeOutQuad
+
+Case	Function	Description
+0	easeInSine	Slow start
+1	easeOutSine	Slow end
+2	easeInOutSine	Slow start and end
+3	easeInQuad	Stronger slow start
+4	easeOutQuad	Stronger slow end
+5	easeInOutQuad	Stronger slow start/end
+6	easeInCubic	Even stronger slow start
+7	easeOutCubic	Even stronger slow end
+8	easeInOutCubic	Even stronger slow start/end
+9	easeInExpo	Extreme slow start
+10	easeOutExpo	Extreme slow end
+11	easeInOutExpo	Extreme slow start/end
+*/ 
+
 void main(){
   float zoom = 1.0;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
