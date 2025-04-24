@@ -101,16 +101,24 @@ void main(){
   vec3 c3 = c_palette(
     rate0 + uv_0.y - uv_2.x,
   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(pow(uv_0.y * uv_2.x, 10.0), pow(uv_0.y * uv_2.x, -20.0), rate0);
-  vec3 c5 = c_palette(
+  vec3 c4 = c_palette(
     rate0 + uv_0.x - uv_2.x,
   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(0.7, rate1 * pow(uv_2.y * uv_2.x, 2.0), rate0);
+  vec3 c5 = c_palette(
+    rate0 + uv_1.x - uv_2.x,
+  vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(uv_1.x, rate1 * pow(uv_2.y * uv_1.x, 2.0), rate0);
+  vec3 c6 = c_palette(
+    rate0 + uv_1.y - uv_0.x,
+  vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(1.0, rate1 * pow(uv_2.y * uv_1.x, 2.0), rate0 * pow(uv_2.y * uv_1.x, 2.0));
 
 
   // vec3 a1[6] = vec3[6](
   //  c3,c2,c1,c2,c2,c1
   // );
+  //  c1,c2,c3,c5,c5,c5
+    // c1,c2,c3,c4,c5,c5
   vec3 a1[6] = vec3[6](
-   c1,c2,c3,c5,c5,c5
+    c1,c2,c3,c4,c5,c6
   );
   int a1_idx = int(mod(rate0 / TAU, 6.0)); // Modulo cycles between 0, 1, 2...etc over time
   vec3 a_out1 = a1[int(a1_idx)];
