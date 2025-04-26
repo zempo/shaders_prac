@@ -72,8 +72,6 @@ vec4 permute(vec4 x) {
 
 vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
 
-vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
-
 float cnoise(vec2 P){
   vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
   vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
@@ -110,16 +108,140 @@ float cnoise(vec2 P){
 
 
 void main(){
-  float zoom = 1.0;
+  float zoom = 3.0;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 
 // to subdivide uv space
-  //uv = fract(uv * 2.0) - 0.5;
+  // uv = fract(uv * 2.) - 0.5;
+
   float rate = u_time * 1.0;
+  float rateh = u_time * .50;
+  float rateq = u_time * .25;
+
+  // ??? base citrusy: vec3(p1+p2, p2-p1, p1-p2)
+
+  // ??? PERM 1: blue purple vs. green red 
+    // * subperm: exp makes noisy sandy rings
+  // *, log zooms in
+  // *, fract creates groovy spiral
+  // float seg = 1.0 * (TAU + 6.0);
+  // uv = modPolar((uv * 1.0), seg);
+  // float p1 = cnoise(uv * 4.0 + rateh);
+  // float p2 = cnoise(uv * .50 - rateh);
+  // vec3 c1 = vec3(p1-p2, p2-p1, p1/p2) * vec3(rate) * vec3(p2, p1, p1) / log(vec3(rate, rate - p1, rate)*.25);
+
+  // ?? PERM 2: blue/white vs lime/green
+    // * subperm: exp makes noisy sandy rings
+  // *, log zooms in
+  // *, fract creates groovy spiral
+  // float seg = 1.0 * (TAU + 6.0);
+  // uv = modPolar((uv * 1.0), seg);
+  // float p1 = cnoise(uv * 4.0 + rateh);
+  // float p2 = cnoise(uv * .50 - rateh);
+  // vec3 c1 = vec3(p1-p2, p1, p1/p2) * vec3(rate) * vec3(p2, p1 - p2, p1) / log(vec3(rate, rate - p1, rate)*.25);
+
+  // ?? PERM 3: rbgy vs blue/green/white (MORE RINGS, increased seg)
+  // * subperm: exp makes noisy sandy rings
+  // *, log zooms in
+  // *, fract creates groovy spiral
+  // float seg = 2.0 * TAU + 6.0;
+  // uv = modPolar((uv * 1.0), seg);
+  // float p1 = cnoise(uv * 4.0 + rateh);
+  // float p2 = cnoise(uv * .50 - rateh);
+  // vec3 c1 = vec3(p1-p2, p2/p1, p1+p2) * vec3(rate) * vec3(p2, p1 - p2, rate) / abs(vec3(rate, rate - p1, rate)*.25);
+
+  // ?? PERM 4: ABS in denom, -._ multiplier adds blur and dimension
+  // * subperm: exp makes noisy sandy rings
+  // *, log zooms in
+  // *, fract creates groovy spiral
+  // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
+  // float seg = 3.0 * (TAU + 6.0) + pow(rate, -2.0);
+  // float seg = 2.0 * TAU + 3.0;
+  // uv = modPolar((uv * 1.0), seg);
+  // float p1 = cnoise(uv * 4.0 + rateh);
+  // float p2 = cnoise(uv * .50 - rateh);
+  // vec3 c1 = vec3(-.7, -.711 * p2 - p1, -.2 * p1-p2) * vec3(rate,.82*rate,rate) * vec3(p2, .3 * p1 - p2, rate) / abs(vec3(rate, rate - p1, p2)*.25);
+
+  // ?? PERM 5: color palette
+  // * subperm: exp makes noisy sandy rings
+  // *, log zooms in
+  // *, fract creates groovy spiral
+  // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
+  // float seg = 3.0 * (TAU + 6.0) + pow(rate, -2.0);
+  // float seg = 2.0 * TAU + 3.0;
+  // uv = modPolar((uv * 2.0), seg);
+  // float p1 = cnoise(uv * 4.0 + rateh);
+  // float p2 = cnoise(uv * .50 - rateh);
+  // vec3 cp1 = c_palette(
+  //    p1 - p2,
+  //   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+  // vec3 cp2 = c_palette(
+  //   .51 * p2 - p1,
+  //   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+  // vec3 c1 = cp1 - cp2;
+
+  // ?? PERM 5: color palette 2 (spin circle, no seg)
+  // * subperm: exp makes noisy sandy rings
+  // *, log zooms in
+  // *, fract creates groovy spiral
+  // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
+  // float seg = 3.0 * (TAU + 6.0) + pow(rate, -2.0);
+  // float seg = .01;
+  // uv = modPolar((uv * 2.0), seg);
+  // float p1 = cnoise(uv * 4.0 + rateh);
+  // float p2 = cnoise(uv * .50 - rateh);
+  // vec3 cp1 = c_palette(
+  //    p1 - p2,
+  //   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.6627, 0.6627, 0.2941), vec3(0.1255, 0.3176, 0.4235));
+  // vec3 cp2 = c_palette(
+  //   .51 * p2 - p1,
+  //   vec3(0.6941, 0.2235, 0.2627), vec3(0.2275, 0.302, 0.5765), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+  // vec3 c1 = cp1 - cp2;
+
+  // ?? PERM 6: groovy fire eye of sauron
+  // * subperm: exp makes noisy sandy rings
+  // *, log zooms in
+  // *, fract creates groovy spiral
+  // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
+  // float seg = 3.0 * (TAU + 6.0) + pow(rate, -2.0);
+  // // float seg = .01;
+  // uv = modPolar((uv * 2.0), seg);
+  // float p1 = cnoise(uv * 4.0 + rateh);
+  // float p2 = cnoise(uv * .50 - rateh);
+  // vec3 cp1 = c_palette(
+  //    p1 - p2,
+  //   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.6627, 0.6627, 0.2941), vec3(0.1255, 0.3176, 0.4235));
+  // vec3 cp2 = c_palette(
+  //   .51 * p2 - p1,
+  //   vec3(0.6941, 0.2235, 0.2627), vec3(0.2275, 0.302, 0.5765), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+  // vec3 c1 = cp1 - cp2 * abs(vec3(uv.y, .1, uv.y));
   
-  vec3 c_out = vec3(1.0);
+  // ***************************************************** !!!!!! winner
+  // ?? PERM 7: blue fire + twist!
+  // * subperm: exp makes noisy sandy rings
+  // *, log zooms in
+  // *, fract creates groovy spiral
+  // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
+  float seg = 1.40 * (TAU + 2.0) + pow(rate, -2.0);
+  // float seg = .01;
+  uv = modPolar((uv * 1.10), seg);
+  uvRipple(uv, -.21 * sin(rateq), rate);
+  float p1 = cnoise(uv * 2.0 + rateh);
+  float p2 = cnoise(uv * .50 - rateh);
+  vec3 cp1 = c_palette(
+     p1 - p2,
+    vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.6627, 0.6627, 0.2941), vec3(0.1255, 0.3176, 0.4235));
+  vec3 cp2 = c_palette(
+    p2 + uv.y / p1 - uv.x,
+    vec3(0.6941, 0.2235, 0.2627), vec3(0.2275, 0.302, 0.5765), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+  vec3 c1 = cp1 / abs(cp2);
+    // vec3 c_out = mix(c1, vec3(0.25), p1);
+
+
+  
+  vec3 c_out = mix(c1, vec3(0.25), p1 - p2);
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);

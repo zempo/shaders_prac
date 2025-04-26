@@ -43,25 +43,24 @@ uv = uv +(p/cLength)*cos(cLength*15.0-rate*.5)*intensity;
 }
 
 float smoothMod(float x, float y, float e){
-    float top = cos(PI * (x/y)) * sin(PI * (x/y));
-    float bot = pow(sin(PI * (x/y)),2.);
-    float at = atan(top/bot);
-    return y * (1./2.) - (1./PI) * at ;
+  float top = cos(PI * (x/y)) * sin(PI * (x/y));
+  float bot = pow(sin(PI * (x/y)),2.);
+  float at = atan(top/bot);
+  return y * (1./2.) - (1./PI) * at ;
 }
 
- 
- vec2 modPolar(vec2 p, float repetitions) {
-    float angle = 2.*3.14/repetitions;
-    float a = atan(p.y, p.x) + angle/2.;
-    float r = length(p);
-    //float c = floor(a/angle);
-    a = smoothMod(a,angle,033323231231561.9) - angle/2.;
-    //a = mix(a,)
-    vec2 p2 = vec2(cos(a), sin(a))*r;
-    return p2;
+vec2 modPolar(vec2 p, float repetitions) {
+  float angle = 2.*3.14/repetitions;
+  float a = atan(p.y, p.x) + angle/2.;
+  float r = length(p);
+  //float c = floor(a/angle);
+  a = smoothMod(a,angle,033323231231561.9) - angle/2.;
+  //a = mix(a,)
+  vec2 p2 = vec2(cos(a), sin(a))*r;
+  return p2;
 }
 
-  float stroke(float x, float s, float w){
+float stroke(float x, float s, float w){
   float d = step(s, x+ w * .5) - step(s, x - w * .5);
   return clamp(d, 0., 1.);
 }
@@ -109,62 +108,14 @@ float cnoise(vec2 P){
 void main(){
   float zoom = 1.0;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
-  float rate0 = pow(u_time,E * .33);
-  float rate1 = pow(u_time,E * .35);
-  float rate2 = pow(u_time,E * .37);
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 
 // to subdivide uv space
   //uv = fract(uv * 2.0) - 0.5;
-
-  // ??? PATTERNS
-  float seg0 = 1.0 * (TAU + 2.0 + (TAU * sin(rate0)));
-  float seg2 = 1.0 * (TAU + 6.0 + (TAU * sin(rate0)));
-  vec2 uv_0 = uv * 1.0; 
-  vec2 uv_1 = uv * 1.0; 
-  vec2 uv_2 = uv * 2.0; 
-  uv_1 = fract(uv_1 * 2.0) - 0.5;
-
-  uv_0 = modPolar((uv_0 * 1.0), seg0);
-  uv_2 = modPolar((uv_2 * 1.0), seg2);
-  uvRipple(uv_0, 1.51, rate0);
-  vec3 c1 = c_palette(
-    rate0 + uv_0.y - uv_0.x,
-  vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
-
-  uv_1 = modPolar((uv_1 * 1.0), seg0);
-  uvRipple(uv_1, 1.51, rate0);
-  vec3 c2 = c_palette(
-    uv_1.x + uv_1.y + rate0,
-  vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
-  vec3 c3 = c_palette(
-    rate0 + uv_0.y - uv_2.x,
-  vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(pow(uv_0.y * uv_2.x, 10.0), pow(uv_0.y * uv_2.x, -20.0), rate0);
-  vec3 c4 = c_palette(
-    rate0 + uv_0.x - uv_2.x,
-  vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(0.7, rate1 * pow(uv_2.y * uv_2.x, 2.0), rate0);
-  vec3 c5 = c_palette(
-    rate0 + uv_1.x - uv_2.x,
-  vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(uv_1.x, rate1 * pow(uv_2.y * uv_1.x, 2.0), rate0);
-  vec3 c6 = c_palette(
-    rate0 + uv_1.y - uv_0.x,
-  vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765)) * vec3(1.0, rate1 * pow(uv_2.y * uv_1.x, 2.0), rate0 * pow(uv_2.y * uv_1.x, 2.0));
-
-
-  // vec3 a1[6] = vec3[6](
-  //  c3,c2,c1,c2,c2,c1
-  // );
-  //  c1,c2,c3,c5,c5,c5
-    // c1,c2,c3,c4,c5,c5
-  vec3 a1[6] = vec3[6](
-    c1,c2,c3,c4,c5,c6
-  );
-  int a1_idx = int(mod(rate0 / TAU, 6.0)); // Modulo cycles between 0, 1, 2...etc over time
-  vec3 a_out1 = a1[int(a1_idx)];
+  float rate = u_time * 1.0;
   
-
-  vec3 c_out = a_out1;
+  vec3 c_out = vec3(1.0);
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
