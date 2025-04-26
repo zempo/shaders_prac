@@ -132,14 +132,15 @@ void main(){
   // float p2 = cnoise(uv * .50 - rateh);
   // vec3 c1 = vec3(p1-p2, p2-p1, p1/p2) * vec3(rate) * vec3(p2, p1, p1) / log(vec3(rate, rate - p1, rate)*.25);
 
-  // ?? PERM 2: blue/white vs lime/green
+  // ?? PERM 2: blue/white vs lime/green + twist!
     // * subperm: exp makes noisy sandy rings
   // *, log zooms in
   // *, fract creates groovy spiral
   // float seg = 1.0 * (TAU + 6.0);
   // uv = modPolar((uv * 1.0), seg);
+  // uvRipple(uv, .21 * sin(rateh), rate);
   // float p1 = cnoise(uv * 4.0 + rateh);
-  // float p2 = cnoise(uv * .50 - rateh);
+  // float p2 = cnoise(uv * 2.50 - rateh);
   // vec3 c1 = vec3(p1-p2, p1, p1/p2) * vec3(rate) * vec3(p2, p1 - p2, p1) / log(vec3(rate, rate - p1, rate)*.25);
 
   // ?? PERM 3: rbgy vs blue/green/white (MORE RINGS, increased seg)
@@ -148,30 +149,30 @@ void main(){
   // *, fract creates groovy spiral
   // float seg = 2.0 * TAU + 6.0;
   // uv = modPolar((uv * 1.0), seg);
-  // float p1 = cnoise(uv * 4.0 + rateh);
+  // float p1 = cnoise(uv * 5.0 + rateh);
   // float p2 = cnoise(uv * .50 - rateh);
   // vec3 c1 = vec3(p1-p2, p2/p1, p1+p2) * vec3(rate) * vec3(p2, p1 - p2, rate) / abs(vec3(rate, rate - p1, rate)*.25);
 
-  // ?? PERM 4: ABS in denom, -._ multiplier adds blur and dimension
+  // ?? PERM 4: ABS in denom, -._ multiplier adds blur and dimension + twist!
   // * subperm: exp makes noisy sandy rings
   // *, log zooms in
   // *, fract creates groovy spiral
   // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
-  // float seg = 3.0 * (TAU + 6.0) + pow(rate, -2.0);
   // float seg = 2.0 * TAU + 3.0;
   // uv = modPolar((uv * 1.0), seg);
+  // uvRipple(uv, .51 * sin(rateh), rate);
   // float p1 = cnoise(uv * 4.0 + rateh);
   // float p2 = cnoise(uv * .50 - rateh);
   // vec3 c1 = vec3(-.7, -.711 * p2 - p1, -.2 * p1-p2) * vec3(rate,.82*rate,rate) * vec3(p2, .3 * p1 - p2, rate) / abs(vec3(rate, rate - p1, p2)*.25);
 
-  // ?? PERM 5: color palette
+  // ?? PERM 5: color palette + dynamic twist!
   // * subperm: exp makes noisy sandy rings
   // *, log zooms in
   // *, fract creates groovy spiral
   // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
-  // float seg = 3.0 * (TAU + 6.0) + pow(rate, -2.0);
   // float seg = 2.0 * TAU + 3.0;
   // uv = modPolar((uv * 2.0), seg);
+  // uvRipple(uv, -1.11 * sin(rate), rateq);
   // float p1 = cnoise(uv * 4.0 + rateh);
   // float p2 = cnoise(uv * .50 - rateh);
   // vec3 cp1 = c_palette(
@@ -182,16 +183,16 @@ void main(){
   //   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
   // vec3 c1 = cp1 - cp2;
 
-  // ?? PERM 5: color palette 2 (spin circle, no seg)
+  // ?? PERM 5: color palette 2 
   // * subperm: exp makes noisy sandy rings
   // *, log zooms in
   // *, fract creates groovy spiral
   // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
-  // float seg = 3.0 * (TAU + 6.0) + pow(rate, -2.0);
-  // float seg = .01;
-  // uv = modPolar((uv * 2.0), seg);
-  // float p1 = cnoise(uv * 4.0 + rateh);
-  // float p2 = cnoise(uv * .50 - rateh);
+  // float seg = 2.0 * (PI + 6.0) + pow(rate, -2.0) + (TAU * sin(rateh));
+  // uv = modPolar((uv * 1.0), seg);
+  // uvRipple(uv, -.821 * sin(rateh), rateq);
+  // float p1 = cnoise(uv * 2.0 + rateh);
+  // float p2 = cnoise(uv * 2.50 - rateh);
   // vec3 cp1 = c_palette(
   //    p1 - p2,
   //   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.6627, 0.6627, 0.2941), vec3(0.1255, 0.3176, 0.4235));
@@ -206,7 +207,6 @@ void main(){
   // *, fract creates groovy spiral
   // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
   // float seg = 3.0 * (TAU + 6.0) + pow(rate, -2.0);
-  // // float seg = .01;
   // uv = modPolar((uv * 2.0), seg);
   // float p1 = cnoise(uv * 4.0 + rateh);
   // float p2 = cnoise(uv * .50 - rateh);
@@ -224,20 +224,44 @@ void main(){
   // *, log zooms in
   // *, fract creates groovy spiral
   // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
+  // float seg = 1.40 * (TAU + 2.0) + pow(rate, -2.0);
+  // // float seg = .01;
+  // uv = modPolar((uv * 1.10), seg);
+  // uvRipple(uv, -.21 * sin(rateh), rate);
+  // float p1 = cnoise(uv * 2.0 + rateh);
+  // float p2 = cnoise(uv * .50 - rateh);
+  // vec3 cp1 = c_palette(
+  //    p1 - p2,
+  //   vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.6627, 0.6627, 0.2941), vec3(0.1255, 0.3176, 0.4235));
+  // vec3 cp2 = c_palette(
+  //   p2 + uv.y / p1 - uv.x,
+  //   vec3(0.6941, 0.2235, 0.2627), vec3(0.2275, 0.302, 0.5765), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+  // vec3 c1 = cp1 / abs(cp2);
+    // vec3 c_out = mix(c1, vec3(0.25), p1);
+
+
+  // ?? PERM 8: blue fire + twist + WARP!
+  // * subperm: exp makes noisy sandy rings
+  // *, log zooms in
+  // *, fract creates groovy spiral
+  // !! abs(vec3(rate, rate - p1, p2)*2001.5) , creates rocket fuel artifacts
+  uv = fract(uv * 1.) - 0.5;
   float seg = 1.40 * (TAU + 2.0) + pow(rate, -2.0);
   // float seg = .01;
   uv = modPolar((uv * 1.10), seg);
-  uvRipple(uv, -.21 * sin(rateq), rate);
+  uvRipple(uv, -.21 * sin(rateh), rate);
+
   float p1 = cnoise(uv * 2.0 + rateh);
   float p2 = cnoise(uv * .50 - rateh);
   vec3 cp1 = c_palette(
      p1 - p2,
-    vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.6627, 0.6627, 0.2941), vec3(0.1255, 0.3176, 0.4235));
+    vec3(0.1098, 0.0118, 0.0118), vec3(0.2275, 0.502, 0.5765), vec3(0.1333, 0.1804, 0.3765), vec3(0.8706, 0.8706, 0.8706));
   vec3 cp2 = c_palette(
     p2 + uv.y / p1 - uv.x,
-    vec3(0.6941, 0.2235, 0.2627), vec3(0.2275, 0.302, 0.5765), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+    vec3(0.6941, 0.2235, 0.2627), vec3(0.5647, 0.2275, 0.5765), vec3(0.5882, 0.3961, 0.5176), vec3(0.3098, 0.1255, 0.4235));
   vec3 c1 = cp1 / abs(cp2);
-    // vec3 c_out = mix(c1, vec3(0.25), p1);
+  // coswarp(c1, uv.x);
+    // vec3 c_out = mix(c1, vec3(0.15), cp1);
 
 
   
