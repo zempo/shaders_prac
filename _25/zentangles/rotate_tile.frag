@@ -182,8 +182,15 @@ void main(){
   c_init = mix(c_init, 1.-c_init, step(uv.y, .1)-step(uv.y, .05));
   
   
-  //  c_init = mix(c_init, 1.-c_init, step(uv2.x-.5 + uv2.y-.5, .1)- step(uv2.x-.5 + uv2.y-.5, .05));
-   c_init = mix(c_init, 1.-c_init, step((uv2.y-.5 + uv2.x-.5), .1)- step(uv2.x-.5 + uv2.y-.5, .05));
+//    c_init = mix(c_init, 1.-c_init, step(uv2.x-.5 + uv2.y-.5, .1) - step(uv2.x-.5 + uv2.y-.5, .05));
+//   c_init = mix(c_init, 1.-c_init, 
+//     step(uv2.x - uv2.y, .1) -  // Changed to subtraction
+//     step(uv2.x - uv2.y, .05)   // Creates a top-right to bottom-left band
+// );
+
+float posBand = step(abs(uv2.x - .5 + uv2.y - .5), 0.025);
+float negBand = step(abs(uv2.x - uv2.y), 0.025);
+c_init = mix(c_init, 1.0 - c_init, max(posBand, negBand));
 
 
   uv = rotateTilePattern(uv);
