@@ -109,16 +109,17 @@ float cnoise(vec2 P){
 void main(){
   float zoom = 1.0;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
+  vec2 uv_cp = uv;
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 
 // to subdivide uv space
-  //uv = fract(uv * 2.0) - 0.5;
+  uv = fract(uv * 2.) - 0.5;
   float rate = u_time * 1.0;
   float rateh = u_time * .5;
   float rateq = u_time * .25;
 
-  // uvRipple(uv, .0001, rate);
+  uvRipple(uv, .05 * sin(rateq), rate);
 
   float s1 = stroke(uv.x, sin(pow(rate, uv.x)) + sin(pow(rateh, -uv.x)), 0.12);
   float s2 = stroke(uv.y, sin(pow(rate, uv.y)) + sin(pow(rateh, -uv.y)), 0.15);
@@ -133,11 +134,31 @@ void main(){
     (s2 + s1 + p1 + p2 + uv.x) * 0.5 + log(uv.x / uv.y),
     vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
 
+  vec3 cp2 = c_palette(
+    exp(uv.y / uv.x),
+    vec3(0.6941, 0.2235, 0.2627), vec3(0.5765, 0.3451, 0.2275), vec3(0.5882, 0.5882, 0.3961), vec3(0.1255, 0.4235, 0.3765));
+
   vec3 c3 = vec3(p2, uv.y, p1);
   
+  // ???? PERMS (blobby, blobby (but different), quads)
   // vec3 c_out = (c1 + c2) + p2;
   // vec3 c_out = (c1 + c2) + p2 - p1;
-  vec3 c_out = cp1;
+
+  // ??? perm 2
+  float quadrantFactor = smoothstep(0.0, 0.1, abs(uv_cp.x * uv_cp.y));
+vec3 bgColor = vec3(
+    0.1 + 0.1 * sin(rate * 0.5), 
+    0.4 + 0.1 * cos(rate * 0.3), 
+    0.5 + 0.1 * sin(rate * 0.7)
+);
+
+// vec3 cmix = mix(cp1,cp2,p2 - p1);
+vec3 cmix = mix(cp1 * cp2,c2,p2 - p1);
+// Final blend (preserve original colors where bright)
+float preserveOriginal = smoothstep(0.3, 0.5, length(cmix));
+vec3 finalOutput = mix(bgColor, cmix, preserveOriginal * (1.0 - quadrantFactor));
+
+  vec3 c_out = cmix ;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
