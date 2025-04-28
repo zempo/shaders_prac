@@ -190,6 +190,7 @@ void main(){
 
 float posBand = step(abs(uv2.x - .5 + uv2.y - .5), 0.025);
 float negBand = step(abs(uv2.x - uv2.y), 0.025);
+// c_init += mix(c_init, 1.0 - c_init, max(posBand, negBand));
 c_init = mix(c_init, 1.0 - c_init, max(posBand, negBand));
 
 
@@ -202,17 +203,26 @@ c_init = mix(c_init, 1.0 - c_init, max(posBand, negBand));
 
     c_init = mix(c_init, 1.-c_init, step(fract(sin(uv2.y -.6  / log(uv.x)) + sin(uv.y *( 5. * sin(t) ) ) * .1), .1 ));
     
-    
-      // c_init = mix(c_init, 1.-c_init, step(fract(sin(uv.y -(tan(t)) ) + sin(uv.x *( 10. * cos(t) ) ) * .2), .1 ));
-    
-    //  c_init = mix(c_init, 1.-c_init, step(cnoise(uv * 500.), 4. * cos(t+ uv.x)));
+    // ?? animation frame flicker!!!!
+    // c_init = mix(c_init, 1.-c_init, step(fract(sin(uv.y -(tan(t / uv.x)) ) + sin(uv.x *( 10. * cos(t) ) ) * .2), .1 ));    
+    // ?? adds fract spiral (sin looks more floral)
+    c_init = mix(c_init, 1.-c_init, step(fract(sin(uv.y -(sin(t * 5.)) ) + sin(uv.x *( 10. * cos(t) ) ) * .2), .1 ));    
+    // c_init = mix(c_init, 1.-c_init, step(fract(sin(uv.y -(tan(t)) ) + sin(uv.x *( 10. * cos(t) ) ) * .2), .1 ));    
+    // ?? darker
+    // c_init = mix(c_init, 1.-c_init, step(cnoise(uv * 500.), 4. * cos(t+ uv.x)));
   }
 
   
   // ??? black and white polka dots
-  vec3 c_out = vec3(c_init.r, c_init.g, c_init.b);
+  // vec3 c_out = vec3(c_init.r, c_init.g, c_init.b);
+  // ??? minutemaid
+  // vec3 c_out = vec3(c_init.r, c_init.g, c_init.b) * vec3(exp(E) / uv.x, uv.y, uv.x * log(uv.x / uv.y));
   // ??? LASER criss cross (use uv with the .5 offset)
   // vec3 c_out = vec3(c_init.r, c_init.g, c_init.b) * (vec3(uv.x / uv.y, sin(rate) * (uv.x / uv.y), .5) * .1);
+  // ??? color spectrum
+  vec3 cp1 = c_palette(sin(uv.y + uv.x * rate) + c_init.r, vec3(1., 0.5, 0.), vec3(0., 1., 0.), vec3(0., 0., 1.), vec3(1., 0., 0.)) * vec3(c_init.r, c_init.g, c_init.b);
+
+  vec3 c_out = cp1;
 
 
   //glslViewer -l FILE.frag texture.png 
