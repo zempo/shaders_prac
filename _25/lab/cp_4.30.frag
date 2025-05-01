@@ -177,22 +177,23 @@ void main(){
 // 	vec3(0.50, 0.20 - (cos(rateq)), 0.25 + (0.5 * sin(rate)))
 // ) + vec3(rateq, .01, rateh);
 
-  //  ?? perm 5: ripple
-//   uvRipple(uv,-.05 * sin(rateh), rateq);
-//     // uv = fract(uv * 10.0) - 5.5;
+  //  ?? perm 5: ripple: zoomed in
+  uvRipple(uv,-.05 * sin(rateh), rateq);
+    // uv = fract(uv * 10.0) - 5.5;
 
-//   float p1_example = 0.5 + 0.5 * cos(10.0 * log(max(uv.y * uv.x,0.03)) / log(max(-sin(rateq) * atan(rateq/rateh) * uv.x * uv.y,0.103)) + 4.0 * uv.y + rate);		
+  float p1_example = 0.5 + 0.5 * cos(10.0 * log(max(uv.y * uv.x,0.03)) / log(max(-sin(rateq) * atan(rateq/rateh) * uv.x * uv.y,0.103)) + 4.0 * uv.y + rate);		
   
-// vec3 cp1 = c_palette(
-// 	p1_example,
-// 	vec3(0.80, 0.50, 0.940),
-// 	vec3(0.20, 0.40, 0.20),
-// 	vec3(2.00, 1.00 / log(max(uv.y,.01)), 1.200),
-// 	vec3(0.50, 0.20 - (cos(rateq)), 0.25 + (0.5 * sin(rate)))
-// ) + vec3(cnoise(uv * 4.0 + rateh), .01, cnoise(uv * .01 + rateh));
+vec3 cp1 = c_palette(
+	p1_example,
+	vec3(0.80, 0.50, 0.940),
+	vec3(0.20, 0.40, 0.20),
+	vec3(2.00, 1.00 / log(max(uv.y,.01)), 1.200),
+	vec3(0.50, 0.20 - (cos(rateq)), 0.25 + (0.5 * sin(rate)))
+) + vec3(cnoise(uv * 4.0 + rateh), .01, cnoise(uv * .01 + rateh));
 
 // ** 👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍👍 nice perm!!!👍 
   //  ?? perm 6: God's tug of war
+  // uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 //   uvRipple(uv,-.01 * sin(rateh) + cnoise(uv * 10.31 + rateh), rateq);
 //     uv = fract(uv * 2.0) - .5;
 
@@ -202,17 +203,18 @@ void main(){
 // 	p1_example,
 // 	vec3(0.80, 0.50, 0.940),
 // 	vec3(0.20, 0.40, 0.20),
-// 	vec3(2.00, 1.00 / log(max(uv.y,.01)), 1.200),
+// 	vec3(2.00, 1.00 / log(max(uv.y,.001)), 1.200),
 // 	vec3(0.50, 0.20 - (cos(rateq)), 0.25 + (0.5 * sin(rate)))
 // );
 
   //  ?? perm 7: anti matter meets mdma
-  // uvRipple(uv,-.05 * sin(rateh) + cnoise(uv * 10.31 + rateh), rateq);
-  //   // uv = fract(uv * 2.0) - .5;
+//   uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
+//   uvRipple(uv,-.05 * sin(rateh) + cnoise(uv * 10.31 + rateh), rateq);
+//     // uv = fract(uv * 2.0) - .5;
 
-  // float p1_example = (atan(max(uv.y / uv.x,.01)) * PI);		
-  // p1_example *= (atan(max(uv.x / uv.y,.01)));		
-  // p1_example *= asin(uv.x / uv.y);		
+//   float p1_example = (atan(max(uv.y / uv.x,.01)) * PI);		
+//   // p1_example *= (atan(max(uv.x / uv.y,.01)));		
+//   p1_example *= sin(uv.x / uv.y);		
 
 
 // vec3 cp1 = c_palette(
@@ -224,19 +226,19 @@ void main(){
 // );
 
 // ??? perm 8: big ole circle
-uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
-  uvRipple(uv,-.01 * sin(rateh) + cnoise(uv * 100.31 + rateq), rateh);
-    // uv = fract(uv * .30) + .5;
+// uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
+//   uvRipple(uv,-.01 * sin(rateh) + cnoise(uv * 20.31 + rateq), rateh);
+//     // uv = fract(uv * .30) + .5;
 
-  float p1_example = length(atan(max(uv.y / uv.x,.001)) * exp(max(uv.y,.001)));			
+//   float p1_example = length(atan(max(uv.y / uv.x,.001)) * exp(max(uv.y,.001)));			
 
-  vec3 cp1 = c_palette(
-	p1_example,
-	vec3(1.00, 0.83, 0.950),
-	vec3(0.30, 0.30, 0.50),
-	vec3(0.80, 0.80, 0.50),
-	vec3(0.10, 0.30, 0.70 - (cos(rateq)))
-);
+//   vec3 cp1 = c_palette(
+// 	p1_example,
+// 	vec3(1.00, 0.83, 0.950),
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(0.80, 0.80, 0.50),
+// 	vec3(0.10, 0.30, 0.70 - (cos(rateq)))
+// );
 
   
   vec3 c_out = cp1;
