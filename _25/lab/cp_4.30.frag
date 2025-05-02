@@ -240,12 +240,26 @@ void main(){
 // 	vec3(0.10, 0.30, 0.70 - (cos(rateq)))
 // );
 
-//  ?? Imax
+//  ?? technicolor
 
 //   float zoom = 1.0;
 // vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
+// uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
+// uvRipple(uv,-.01 * sin(rateh) + cnoise(uv * 10.01 + rateq), rateh);
+// // uv = fract(uv * 2.0) - 1.25;
+// float p1_example = length(atan(max(uv.y / uv.x,.001)) * exp(max(uv.y,.001)));		
+
+// vec3 cp1 = c_palette(
+// 	p1_example,
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(2.00, 2.00, 2.00),
+// 	vec3(1.00 * sin(rateq), 1.00, 1.00)
+// );
+
+//  ?? bad reception
 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
-uvRipple(uv,-.01 * sin(rateh) + cnoise(uv * 10.01 + rateq), rateh);
+uvRipple(uv,-.1 * sin(rateh) + cnoise(uv * 10.01 + rateq), rateh);
 // uv = fract(uv * 2.0) - 1.25;
 float p1_example = length(atan(max(uv.y / uv.x,.001)) * exp(max(uv.y,.001)));		
 
@@ -254,9 +268,12 @@ vec3 cp1 = c_palette(
 	vec3(1.00, 1.00, 1.00),
 	vec3(1.00, 1.00, 1.00),
 	vec3(2.00, 2.00, 2.00),
-	vec3(1.00 * cos(rateq) * sin(rateh), 1.00, 1.00 - (cos(rateq)))
+	vec3(1.00 * sin(rateq), 1.00, 1.00 - sin(pow(rated, uv.y + uv.x)))
 );
 
+//  ??? bad reception 
+// static-y
+	// // vec3(1.00 * sin(rateq), 1.00 - cos(rateq), 1.00 - sin(pow(rateq, uv.y + uv.x))) 
   
   vec3 c_out = cp1;
   //glslViewer -l FILE.frag texture.png 
