@@ -182,9 +182,9 @@ float cNoise(vec3 p) {
   float x = snoise(p-1.);
   float y = snoise(p+1.);
   vec2 d = vec2(x,y);
-  float m_x = abs(u_mouse.x * .0005);
+  float m_x = (u_mouse.x * .00025);
   float m_y = abs(u_mouse.y * .001);
-  vec2 pol = vec2(length(d), atan(d.y, d.x));
+  vec2 pol = vec2(length(d - m_x), atan(d.y, d.x));
   
   float r = snoise(p+vec3(pol, p.z));
   
@@ -206,18 +206,22 @@ void main(){
   float rateh = u_time * .50;
   float rateq = u_time * .25;
 
-  float p1 = cNoise(vec3(uv * 4., rateq * .5));
+    float m_x = (u_mouse.x * .0005);
+  float m_y = (u_mouse.y * .0001);
+
+  float p1 = cNoise(vec3(uv * 4., rateq * .13));
 vec3 cp1 = c_palette(
-	smoothstep(-.5, .5, p1),
+	smoothstep(-2.5, 2.5, p1),
 	vec3(1.00, 1.00, 1.00),
 	vec3(1.00, 1.00, 1.00),
 	vec3(2.00, 2.00, 2.00),
-	vec3(0.15, 1.00, 0.00 + (0.5 * sin(rateq * .5)))
+	vec3(0.15 - (0.5 * cos(rateq)), 1.00, 0.00)
 );
 
-  vec3 c1 = vec3(smoothstep(-.5, .5, p1),smoothstep(-.115 - sin(u_time * .1), .15, p1),smoothstep(-.25 / sin(u_time), .5, p1));
+  vec3 c1 = vec3(smoothstep(-.5, .5, p1),smoothstep(-.115 - sin(u_time * .1), .15, p1),smoothstep(-.25 / sin(u_time * .1), .5, p1));
   
-  vec3 c_out = mix(c1, cp1, smoothstep(-.5, .5, p1));
+  vec3 c_out = mix(c1, cp1, uv.y + m_y / p1 * sin(rateq) - m_x);
+  // vec3 c_out = cp1;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
