@@ -95,7 +95,7 @@ plus various other papers & books
 		"\treturn t*t*t*(t*(t*6.0-15.0)+10.0);",
 		"}",
 		"",
-		"float cnoise(vec2 p) {",
+		"float cnoise(vec2 P) {",
 		"vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);",
 		"vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);",
 		"Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation",

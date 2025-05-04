@@ -6,6 +6,7 @@ precision mediump float;
 
 uniform vec2 u_resolution;
 uniform float u_time;
+//uniform vec2 u_mouse;
 //uniform sampler2D u_tex;
 out vec4 FragColor;
 
@@ -13,7 +14,7 @@ const float PI = 3.1415926535897932384626433832795;
 const float TAU = PI * 2.;
 const float E = 2.71828182845904523536028747135266;
 // http://dev.thi.ng/gradients/
-vec3 c_palette( float t, vec3 a, vec3 b, vec3 c, vec3 d) {
+vec3 pal( float t, vec3 a, vec3 b, vec3 c, vec3 d) {
   return a + b * cos(TAU * (c * t + d));
 }
 
@@ -65,16 +66,15 @@ float stroke(float x, float s, float w){
   return clamp(d, 0., 1.);
 }
 
-// *Classic Perlin 2D Noise by Stefan Gustavson
-vec4 permute(vec4 x) {
-  return mod(((x*34.0)+1.0)*x, 289.0);
-}
+// *Classic Perlin 2D Noise by Stefan Gustavson (improved by Ian McEwan, Ashima Arts)
+vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
 
 vec2 fade(vec2 t) {
   return t*t*t*(t*(t*6.0-15.0)+10.0);
 }
 
-float cnoise(vec2 p) {
+float cnoise(vec2 P) {
 vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
 vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
 Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
@@ -107,8 +107,22 @@ float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
 return 2.3 * n_xy;
 }
 
+  /* 
+  * from Liam Egan (https://codepen.io/shubniggurath)
+  discontinuous pseudorandom uniformly distributed in [-0.5, +0.5]^3 */
+vec3 random3(vec3 c) {
+	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
+	vec3 r;
+	r.z = fract(512.0*j);
+	j *= .125;
+	r.x = fract(512.0*j);
+	j *= .125;
+	r.y = fract(512.0*j);
+	return r-0.5;
+}
+
 void main(){
-  float zoom = 1.0;
+  float zoom = 1.;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
@@ -120,8 +134,11 @@ void main(){
   float rated = u_time * 2.0;
   float rateh = u_time * .50;
   float rateq = u_time * .25;
+  float rateinf = u_time * .0000015;
+
+  vec3 c1 = random3(vec3(uv.x));
   
-  vec3 c_out = vec3(1.0);
+  vec3 c_out = c1;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
