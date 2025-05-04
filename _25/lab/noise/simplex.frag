@@ -245,18 +245,62 @@ vec3 c = vec3(cos(a));
 
   vec2 uv_a = vec2(uv.x * .1, uv.y) * 15.0 * rot;
 
+//  ??? HEAT MAP
+  // float n = simplex3d(vec3(uv_a * rot_b, rateqq));
+  // vec2 uv_b = fract(vec2(uv_a.x * 5. - sin(rateqqq), uv_a.y * 1. + cos(rateqqq)) * 2.);
+  // n += simplex3d(vec3(uv_a*2.*.3+.7, rateqqq)*2.)*.8;
+  // // n *= simplex3d(vec3(uv_a*2.*.3+.7, rateqqq)*2.)*.8;
+  // float n_ref1 = n;
+  // float ncol = simplex3d(vec3(100.+uv_a*1., rateA2)*2.)*.8;
 
+  // c = pal(smoothstep(-2.5, .001, log(max(n_ref1,.05))),
+	// vec3(0.92, 1.00, 1.00),
+	// vec3(1.00, 1.00, 1.00),
+	// vec3(2.00, 2.00, 2.00),
+	// vec3(0.48, 0.70, 0.00)
+  // );
+//  ??? green tv monitor
+  // float n = simplex3d(vec3(uv_a * rot_b, rateqq));
+  // vec2 uv_b = fract(vec2(uv_a.x * 10.25 - sin(rateqqq), uv_a.y * 100. + cos(rateqqq)));
+  // n += simplex3d(vec3(uv_b*2.*.3+.7, rateqqq)*2.)*.8;
+  // // n *= simplex3d(vec3(uv_a*2.*.3+.7, rateqqq)*2.)*.8;
+  // float n_ref1 = n;
+  // float ncol = simplex3d(vec3(100.+uv_a*1., rateA2)*2.)*.8;
+
+  // c = pal(smoothstep(-2.5, .001, log(max(n_ref1,.05))),
+	// vec3(0.30, 0.50, 0.60),
+	// vec3(0.20, 0.40, 0.20),
+	// vec3(2.00, 1.00, 1.00),
+	// vec3(0.50, 0.20, 0.25)
+  // );
+//  ??? smooth green monitor
+  // float n = simplex3d(vec3(uv_a * rot_b, rateqq));
+  // vec2 uv_b = fract(vec2(uv_a.x * 10.25 - sin(rateqqq), uv_a.y * 100. + cos(rateqqq)));
+  // n += simplex3d(vec3(uv_a*2.*.3+.7, rateqqq)*2.)*.8;
+  // // n *= simplex3d(vec3(uv_a*2.*.3+.7, rateqqq)*2.)*.8;
+  // float n_ref1 = n;
+  // float ncol = simplex3d(vec3(100.+uv_a*1., rateA2)*2.)*.8;
+
+  // c = pal(smoothstep(-3.1 - cos(rateqq), .001, log(max(n_ref1,.05))),
+	// vec3(0.30, 0.50, 0.60),
+	// vec3(0.20, 0.40, 0.20),
+	// vec3(2.00, 1.00, 1.00),
+	// vec3(0.50, 0.20, 0.25)
+  // );
+
+//  ??? HEAT MAP
   float n = simplex3d(vec3(uv_a * rot_b, rateqq));
-  vec2 uv_b = fract(vec2(uv_a.x * 10. - sin(rateqqq), uv_a.y * 105. + cos(rateqqq)) * 1.);
-  n += simplex3d(vec3(uv_b*2.*.3+4.7, rateqq)*2.)*.8;
+  vec2 uv_b = fract(vec2(uv_a.x * 10.25 - sin(rateqqq), uv_a.y * 100. + cos(rateqqq)));
+  n += simplex3d(vec3(uv_b*rot_b*2.*.3+.7, rateqqq)*2.)*.8;
+  // n *= simplex3d(vec3(uv_a*2.*.3+.7, rateqqq)*2.)*.8;
   float n_ref1 = n;
   float ncol = simplex3d(vec3(100.+uv_a*1., rateA2)*2.)*.8;
 
-  c = pal(n_ref1*.5,
-  	vec3(0.16 -(.15 * cos(rate)), 0.64, 0.64),
-	vec3(0.50, 0.50, 0.50),
-	vec3(2.00, 1.00, 0.00),
-	vec3(0.48, 0.20, 0.25)
+  c = pal(n_ref1 * .25,
+	vec3(0.80 - (.5 * cos(rateq)), 0.50 - (.15 * sin(rateq)), 0.940),
+	vec3(0.20, 0.40, 0.20),
+	vec3(2.00, 1.00, 1.00),
+	vec3(0.50, 0.20, 0.25)
   );
   
   vec3 c_out = c;
