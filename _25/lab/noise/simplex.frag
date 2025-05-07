@@ -215,6 +215,54 @@ float inRect (vec2 pt, vec2 btmL, vec2 topR) {
   return s.x * s.y;
 }
 
+vec2 rotate2D (vec2 _st, float _angle) {
+    _st -= 0.5;
+    _st =  mat2(cos(_angle),-sin(_angle),
+                sin(_angle),cos(_angle)) * _st;
+    _st += 0.5;
+    return _st;
+}
+
+
+
+vec2 rotateTilePattern(vec2 _st){
+
+    //  Scale the coordinate system by 2x2
+    _st *= 2.0;
+
+    //  Give each cell an index number
+    //  according to its position
+    float index = 0.0;
+    index += step(1., mod(_st.x,2.0));
+    index += step(1., mod(_st.y,2.0))*2.0;
+
+    //      |
+    //  2   |   3
+    //      |
+    //--------------
+    //      |
+    //  0   |   1
+    //      |
+
+    // Make each cell between 0.0 - 1.0
+    _st = fract(_st);
+
+    // Rotate each cell according to the index
+    if(index == 1.0){
+        //  Rotate cell 1 by 90 degrees
+        _st = rotate2D(_st,PI*0.5);
+    } else if(index == 2.0){
+        //  Rotate cell 2 by -90 degrees
+        _st = rotate2D(_st,PI*-0.5);
+    } else if(index == 3.0){
+        //  Rotate cell 3 by 180 degrees
+        _st = rotate2D(_st,PI);
+    }
+
+    return _st;
+}
+
+
 void main(){
   float zoom = 1.0;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
@@ -288,9 +336,15 @@ vec3 c = vec3(cos(a));
 	// vec3(0.50, 0.20, 0.25)
   // );
 
-//  ??? HEAT MAP
+//  ??? The "glslViewer crasher"
   float n = simplex3d(vec3(uv_a * rot_b, rateqq));
-  vec2 uv_b = fract(vec2(uv_a.x * 10.25 - sin(rateqqq), uv_a.y * 100. + cos(rateqqq)));
+  // vec2 uv_b = fract(vec2(uv_a.x * 10.25 - sin(rateqqq), uv_a.y * 100. + cos(rateqqq)));
+  vec2 uv_b = mod(uv_a, vec2(uv_a.x * .03 - sin(rateqqq), uv_a.y * .01 + cos(rateqqq)));
+  // vec2 uv_b = rotateTilePattern(uv_a);
+  // uv_b = rotateTilePattern(uv_a);
+  // uv_b = rotateTilePattern(uv_a);
+  // uv_b = rotateTilePattern(uv_a);
+  uv_b += rotateTilePattern(uv_a + sin(rateqq * length(uv_a)));
   n += simplex3d(vec3(uv_b*rot_b*2.*.3+.7, rateqqq)*2.)*.8;
   // n *= simplex3d(vec3(uv_a*2.*.3+.7, rateqqq)*2.)*.8;
   float n_ref1 = n;
@@ -302,7 +356,7 @@ vec3 c = vec3(cos(a));
 	vec3(2.00, 1.00, 1.00),
 	vec3(0.50, 0.20, 0.25)
   );
-  
+   
   vec3 c_out = c;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
