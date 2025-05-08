@@ -151,14 +151,66 @@ void main(){
   // vec3 c1 = mix(vec3(uv * 3., rateq), t1, sin(rateq * .001));
   // float p1 = fbm(c1, 0.01);
 
-float scale = 100.0;
+
+//  ??? PERM 1: harmonics
+// float scale = 100.0;
+//   float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
+//   float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
+// float threshold = 0.5;
+// float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
+// float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
+  
+// vec3 cp1 = pal(
+// 	material + material2 + cnoise((uv * 4.) + rateh) + cnoise((uv * .2) + rateq),
+// 	vec3(1.00, 0.30, 0.50),
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(2.00, 0.97, 0.59),
+// 	vec3(0.10, 0.30, 0.70)
+// );
+
+//  ??? PERM 2: dead pixels 
+// float scale = 100.0 - (25. * sin(rateq * .5));
+//   float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
+//   float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
+// float threshold = 0.5;
+// float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
+// float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
+  
+// vec3 cp1 = pal(
+// 	material + material2 / cnoise((uv * 4.) + rateh) * cnoise((uv * .2) + rateq),
+// 	vec3(1.00, 0.30, 0.50),
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(2.00, 0.97, 0.59),
+// 	vec3(0.10, 0.30, 0.70)
+// );
+
+  // vec3 c_out = cp1;
+
+//  ??? PERM 3: dead pixels 
+float scale = 100.0 - (25. * sin(rateq * .5));
   float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
-  float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,20.1)),rate * uv.y)); // Scale adjusts the frequency
+  float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
 float threshold = 0.5;
 float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
 float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
   
-  vec3 c_out = vec3(material, material2 + cnoise(uv * 4. + rate), material2 + cnoise(uv * 4. + rate));
+vec3 cp1 = pal(
+	material * material2,
+	vec3(1.00, 0.30, 0.50),
+	vec3(0.30, 0.30, 0.50),
+	vec3(2.00, 0.97, 0.59),
+	vec3(0.10, 0.30, 0.70)
+);
+
+vec3 cp2 = pal(
+	cnoise((uv * 4.) + rateh) + cnoise((uv * 5.2) + rateq),
+	vec3(0.25, 0.57, 0.68),
+	vec3(0.30, 0.30, 0.50),
+	vec3(0.80, 0.80, 0.50),
+	vec3(0.10, 0.30, 0.70)
+);
+//  !! add clamp here
+  vec3 c_out = mix(cp1, cp2, sin(rateq * .5));
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   // FragColor = texture2D(u_tex, uv);
