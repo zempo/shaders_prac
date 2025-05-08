@@ -7,7 +7,7 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 //uniform vec2 u_mouse;
-//uniform sampler2D u_tex;
+uniform sampler2D u_tex1,u_tex2;
 out vec4 FragColor;
 
 const float PI = 3.1415926535897932384626433832795;
@@ -114,24 +114,25 @@ float gyroid(vec3 p) {
 
 // fbm (fractal brownian motion) 
 float fbm(vec3 p, float rate_mult) {
-  float output = 0.0;
+  float result = 0.0;
   float a = 0.5;
 
   float rate_local = u_time * rate_mult;
 
   float lim = 7.0;
   for(float i = 0.0; i < lim; ++i){
-    p += output * .1;
+    p += result * .1;
     p.z += rate_local;
-    output += abs(gyroid(p / a) * a);
+    result += abs(gyroid(p / a) * a);
     a /= 1.7;
   }
-  return output;
+  return result;
 }
 
 void main(){
   float zoom = 1.0;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
+  // vec2 uv = zoom * (gl_FragCoord.xy - 0.5 * u_resolution.xy) / min(u_resolution.y, u_resolution.x);
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 
@@ -142,10 +143,24 @@ void main(){
   float rated = u_time * 2.0;
   float rateh = u_time * .50;
   float rateq = u_time * .25;
+
+  uv *= 1.;
+
+  // vec3 t1 = texture2D(u_tex1, uv).rgb;
+  // vec3 t2 = texture2D(u_tex2, uv).rgb;
+  // vec3 c1 = mix(vec3(uv * 3., rateq), t1, sin(rateq * .001));
+  // float p1 = fbm(c1, 0.01);
+
+float scale = 100.0;
+  float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
+  float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,20.1)),rate * uv.y)); // Scale adjusts the frequency
+float threshold = 0.5;
+float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
+float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
   
-  vec3 c_out = vec3(1.0);
+  vec3 c_out = vec3(material, material2 + cnoise(uv * 4. + rate), material2 + cnoise(uv * 4. + rate));
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
-  //FragColor = texture2D(u_tex, uv);
-  FragColor = vec4(c_out, 1.0);
+  // FragColor = texture2D(u_tex, uv);
+  FragColor += vec4(c_out, 1.0);
 }
