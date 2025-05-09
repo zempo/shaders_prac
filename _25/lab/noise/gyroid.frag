@@ -345,7 +345,45 @@ void main(){
 //   float brightness = 0.75;
 //   vec3 c_out = mix(cp2, cp1, abs(log(max(t1,.75)))) * brightness;
 
-//  ??? PERM 5: psychadelia clouds  glslViewer -l _25/lab/noise/gyroid.frag noise.png
+//  ??? PERM 6: psychadelia clouds  glslViewer -l _25/lab/noise/gyroid.frag noise.png
+// ??? uv ripple
+// uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
+// vec3 t1 = texture2D(u_tex1, uv).rgb;
+
+// float scale = 100.;
+//   float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
+//   float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
+// float threshold = 0.5;
+// float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
+// float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
+
+// vec3 c1 = vec3(uv.y*2., (rateq * .25) + uv.y*.34, uv.x*2.);
+//   coswarp(c1, .70 + (.25 * sin(rateq)));
+
+// float p1 = fbm(c1, 0.01);
+
+  
+// vec3 cp1 = pal(
+// 	cnoise((uv * 1.2 + rateq)) + p1,
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(0.80, 0.80, 0.50),
+// 	vec3(0.10, 0.30, 0.70)
+// );
+
+// vec3 cp2 = pal(
+// 	cnoise((uv * 1.2 + rateq * .1)) + p1,
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(2.00, 2.00, 2.00),
+// 	vec3(0.1 - cos(rateq), 1.00, 0.01 - sin(rateq))
+// );
+
+//   float brightness = 0.75;
+//   vec3 c_out = mix(cp2, cp1, abs(log(max(t1,1.)))) * brightness;
+
+//  ??? PERM 6: sunset  glslViewer -l _25/lab/noise/gyroid.frag noise.png
+// ??? uv ripple
 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 vec3 t1 = texture2D(u_tex1, uv).rgb;
 
@@ -356,31 +394,38 @@ float threshold = 0.5;
 float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
 float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
 
-vec3 c1 = vec3(uv.y*2., (rateq * .25) + uv.y*.34, uv.x*2.);
-uvRipple(uv, .21 + (.1 * cos(rateq)), c1.b + c1.r);
+vec3 c1 = vec3(uv.y*4., (rateq * .25) + uv.y*.34, uv.x*2.);
+  // coswarp(c1, .70 + (.25 * sin(rateq)));
+
 float p1 = fbm(c1, 0.01);
-uvRipple(uv, .1 + (.1 * sin(rate)), p1);
-uvRipple(uv, .1 + (.1 * cos(rate)), p1);
 
   
 vec3 cp1 = pal(
 	cnoise((uv * 1.2 + rateq)) + p1,
-	vec3(0.30, 0.30, 0.50),
-	vec3(0.30, 0.30, 0.50),
-	vec3(0.80, 0.80, 0.50),
-	vec3(0.10, 0.30, 0.70)
+	vec3(0.80, 0.50, 0.40),
+	vec3(0.20, 0.40, 0.20),
+	vec3(2.00, 1.00, 1.00),
+	vec3(0.50, 0.20, 0.25)
 );
 
 vec3 cp2 = pal(
 	cnoise((uv * 1.2 + rateq * .1)) + p1,
-	vec3(1.00, 1.00, 1.00),
-	vec3(1.00, 1.00, 1.00),
-	vec3(2.00, 2.00, 2.00),
-	vec3(0.1 - cos(rateq), 1.00, 0.01 - sin(rateq))
+	vec3(0.98, 0.95, 0.40),
+	vec3(0.20, 0.40, 0.20),
+	vec3(.50, .50, .50),
+	vec3(0.50, 0.20, 0.25)
 );
 
-  float brightness = 0.75;
-  vec3 c_out = mix(cp2, cp1, abs(log(max(t1,1.)))) * brightness;
+vec3 cp3 = pal(
+  cnoise((uv * 1.2 + rateq * .1)) + p1,
+  	vec3(1.00, 1.00, 1.00),
+	vec3(1.00, 1.00, 1.00),
+	vec3(2.00, 2.00, 2.00),
+	vec3(0.00, 1.00, 0.00)
+);
+
+  vec3 brightness = .75 + (.13 * vec3(uv.y, uv.x, uv.y));
+  vec3 c_out = mix(cp2, cp1, abs(log(max(t1.b * t1.r,1.1)))) * brightness;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   // FragColor = texture2D(u_tex, uv);
