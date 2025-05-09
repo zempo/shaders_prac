@@ -7,7 +7,8 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 //uniform vec2 u_mouse;
-uniform sampler2D u_tex1,u_tex2;
+uniform sampler2D u_tex1;
+// uniform sampler2D u_tex1,u_tex2;
 out vec4 FragColor;
 
 const float PI = 3.1415926535897932384626433832795;
@@ -186,16 +187,52 @@ void main(){
 
   // vec3 c_out = cp1;
 
-//  ??? PERM 3: dead pixels 
-float scale = 100.0 - (25. * sin(rateq * .5));
+//  ??? PERM 3: very dead pixels 1 
+// vec3 t1 = texture2D(u_tex1, uv).rgb;
+
+// float scale = log(max(75.0 * uv.x,sin(rate)));
+//   float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
+//   float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
+// float threshold = 0.5;
+// float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
+// float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
+
+// vec3 c1 = vec3(uv*3., u_time*2.);
+// float p1 = fbm(c1, 0.01);
+  
+// vec3 cp1 = pal(
+// 	log(material + material2),
+// 	vec3(1.00, 0.30, 0.50),
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(2.00, 0.97, 0.59),
+// 	vec3(0.10, 0.30, 0.70)
+// );
+
+// vec3 cp2 = pal(
+// 	cnoise((uv * 4.) + rateh) + cnoise((uv * 5.2) + rateq) + p1,
+// 	vec3(0.25, 0.57, 0.68),
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(0.80, 0.80, 0.50),
+// 	vec3(0.10, 0.30, 0.70)
+// );
+// //  !! add clamp here
+//   vec3 c_out = mix(cp2, cp1 + cp2, abs(log(p1 * p1)));
+
+//  ??? PERM 3: very dead pixels 1 
+vec3 t1 = texture2D(u_tex1, uv).rgb;
+
+float scale = 100.;
   float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
   float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
 float threshold = 0.5;
 float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
 float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
+
+vec3 c1 = vec3(uv.y*3., u_time*2.,uv.x);
+float p1 = fbm(c1, 0.01);
   
 vec3 cp1 = pal(
-	material * material2,
+	log(material + material2),
 	vec3(1.00, 0.30, 0.50),
 	vec3(0.30, 0.30, 0.50),
 	vec3(2.00, 0.97, 0.59),
@@ -203,14 +240,14 @@ vec3 cp1 = pal(
 );
 
 vec3 cp2 = pal(
-	cnoise((uv * 4.) + rateh) + cnoise((uv * 5.2) + rateq),
+	cnoise((uv * 4.) + rateh) + cnoise((uv * 5.2) + rateq) + p1,
 	vec3(0.25, 0.57, 0.68),
 	vec3(0.30, 0.30, 0.50),
 	vec3(0.80, 0.80, 0.50),
 	vec3(0.10, 0.30, 0.70)
 );
 //  !! add clamp here
-  vec3 c_out = mix(cp1, cp2, sin(rateq * .5));
+  vec3 c_out = mix(cp2, cp1 + cp2, abs(log(p1 * p1)));
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   // FragColor = texture2D(u_tex, uv);
