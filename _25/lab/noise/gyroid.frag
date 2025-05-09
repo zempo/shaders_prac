@@ -382,7 +382,7 @@ void main(){
 //   float brightness = 0.75;
 //   vec3 c_out = mix(cp2, cp1, abs(log(max(t1,1.)))) * brightness;
 
-//  ??? PERM 6: sunset  glslViewer -l _25/lab/noise/gyroid.frag noise.png
+//  ??? PERM 7: sunset  glslViewer -l _25/lab/noise/gyroid.frag noise.png
 // ??? uv ripple
 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 vec3 t1 = texture2D(u_tex1, uv).rgb;
