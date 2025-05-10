@@ -145,6 +145,31 @@ void main(){
   vec3 c1 = vec3(uv.y*4., (rateq * .25) + uv.y*.34, uv.x*2.);
   float p1 = fbm(c1, 0.01);
 
+  vec3 cp1 = pal(
+	cnoise((uv * 1.2 + rateq)) + p1,
+	vec3(0.80, 0.50, 0.40),
+	vec3(0.20, 0.40, 0.20),
+	vec3(2.00, 1.00, 1.00),
+	vec3(0.50, 0.20, 0.25)
+  );
+
+  vec3 cp2 = pal(
+	cnoise((uv * 1.2 + rateq * .1)) + p1,
+	cnoise((uv * 1.2 + rateq * .1)) + p1,
+	vec3(1.00, 0.97, 1.00),
+	vec3(0.30, 0.30, 0.50),
+	vec3(0.80, 0.80, 0.50),
+	vec3(0.10, 0.30, 0.70)
+  );
+
+  vec3 cp_gray = pal(
+  cnoise((uv * 1.2 + rateq * .1)) + p1,
+  vec3(1.00, 1.00, 1.00),
+	vec3(1.00, 1.00, 1.00),
+	vec3(2.00, 2.00, 2.00),
+	vec3(0.00, 1.00, 0.00)
+);
+
   if (cellID == 0) {
 
   } else if (cellID == 1) {
