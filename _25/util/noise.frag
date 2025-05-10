@@ -165,6 +165,28 @@ float cnoise(vec2 P){
   return 2.3 * n_xy;
 }
 
+// gyroid fxn
+float gyroid(vec3 p) {
+  return dot(cos(p), sin(p.yxz));
+}
+
+// fbm (fractal brownian motion) 
+float fbm(vec3 p, float rate_mult) {
+  float result = 0.0;
+  float a = 0.5;
+
+  float rate_local = u_time * rate_mult;
+
+  float lim = 7.0;
+  for(float i = 0.0; i < lim; ++i){
+    p += result * .1;
+    p.z += rate_local;
+    result += abs(gyroid(p / a) * a);
+    a /= 1.7;
+  }
+  return result;
+}
+
 // =========================================================
 // =========================================================
 // =========================================================
