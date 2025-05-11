@@ -7,7 +7,7 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 //uniform vec2 u_mouse;
-//uniform sampler2D u_tex;
+uniform sampler2D u_tex;
 out vec4 FragColor;
 
 const float PI = 3.1415926535897932384626433832795;
@@ -107,7 +107,26 @@ float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
 return 2.3 * n_xy;
 }
 
+float gyroid(vec3 p) {
+  return dot(cos(p), sin(p.yxz));
+}
 
+// fbm (fractal brownian motion) 
+float fbm(vec3 p, float rate_mult) {
+  float result = 0.0;
+  float a = 0.5;
+
+  float rate_local = u_time * rate_mult;
+
+  float lim = 7.0;
+  for(float i = 0.0; i < lim; ++i){
+    p += result * .1;
+    p.z += rate_local;
+    result += abs(gyroid(p / a) * a);
+    a /= 1.7;
+  }
+  return result;
+}
 
 void main(){
   float zoom = 1.0;
@@ -126,8 +145,8 @@ void main(){
   // ??? HARD SPLIT 3x2
   uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
   // tiling (for noise texture)
-  vec3 t1 = texture2D(u_tex1, uv).rgb;
-  uv = fract(uv * vec2(3., 2.)) - 0.5;
+  vec3 t1 = texture2D(u_tex, uv).rgb;
+  uv = fract(uv * 1.) - 0.5;
 
   float cellW = 1.0 / 3.0; // 3 columns
   float cellH = 1.0 / 2.0; // 2 rows
@@ -141,7 +160,6 @@ void main(){
   int cellID = cellX + cellY * 3;
 
   // * UV defaults (will vary in some cells)
-  float mix_v = abs(log(max(t1.b * t1.r, 1.1)));
   vec3 c1 = vec3(uv.y*4., (rateq * .25) + uv.y*.34, uv.x*2.);
   float p1 = fbm(c1, 0.01);
 
@@ -154,7 +172,6 @@ void main(){
   );
 
   vec3 cp2 = pal(
-	cnoise((uv * 1.2 + rateq * .1)) + p1,
 	cnoise((uv * 1.2 + rateq * .1)) + p1,
 	vec3(1.00, 0.97, 1.00),
 	vec3(0.30, 0.30, 0.50),
@@ -170,21 +187,87 @@ void main(){
 	vec3(0.00, 1.00, 0.00)
 );
 
+  float mix_v = abs(log(max(t1.b * t1.r, 1.1)));
+  vec3 brightness = .75 + (.13 * vec3(uv.y, uv.x, uv.y));
+
+  vec3 c_out;
+
   if (cellID == 0) {
+
+         cp1 = pal(
+	cnoise((uv * 1.2 + rateq)) + p1,
+	vec3(0.30, 0.30, 0.50),
+	vec3(0.30, 0.30, 0.50),
+	vec3(0.80, 0.80, 0.50),
+	vec3(0.10, 0.30, 0.70)
+);
+
+ cp2 = pal(
+	cnoise((uv * 1.2 + rateq * .1)) + p1,
+	vec3(1.00, 1.00, 1.00),
+	vec3(1.00, 1.00, 1.00),
+	vec3(2.00, 2.00, 2.00),
+	vec3(0.1 - cos(rateq), 1.00, 0.01 - sin(rateq))
+);
+
+    c_out = mix(cp2, cp1, mix_v) * brightness;
 
   } else if (cellID == 1) {
 
+    cp1 = pal(
+	cnoise((uv * 1.2 + rateq)) + p1,
+	vec3(1.00, 1.00, 1.00),
+	vec3(1.00, 1.00, 1.00),
+	vec3(2.00, 2.00, 2.00),
+	vec3(0.01, 1.00, 0.00)
+);
+
+    cp2 = pal(
+	cnoise((uv * 1.2 + rateq * .1)) + p1,
+	vec3(0.50, 0.50, 0.50),
+	vec3(0.50, 0.50, 0.50),
+	vec3(1.00, 1.00, 1.00),
+	vec3(0.00, 0.33, 0.67)
+);
+
+    c_out = mix(cp2, cp1, mix_v) * brightness;
+
   } else if (cellID == 2) {
+
+    c_out = mix(cp1, cp1, mix_v) * brightness;
 
   } else if (cellID == 3) {
 
+    c_out = mix(cp2, cp1, mix_v) * brightness;
+
   } else if (cellID == 4) {
+
+        cp1 = pal(
+	cnoise((uv * 1.2 + rateq)) + p1,
+	vec3(0.80, 0.50, 0.40),
+	vec3(0.20, 0.40, 0.20),
+	vec3(2.00, 1.00, 1.00),
+	vec3(0.50, 0.20, 0.25)
+);
+
+ cp2 = pal(
+	cnoise((uv * 1.2 + rateq * .1)) + p1,
+	vec3(0.98, 0.95, 0.40),
+	vec3(0.20, 0.40, 0.20),
+	vec3(.50, .50, .50),
+	vec3(0.50, 0.20, 0.25)
+);
+
+    c_out = mix(cp2, cp1, mix_v) * brightness;
 
   } else {
 
+    brightness = .25 + (.13 * vec3(uv.y, uv.x, uv.y));
+    c_out = mix(cp2 / cp1, cp1, mix_v) * brightness;
+
   }
   
-  vec3 c_out = vec3(1.0);
+
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
