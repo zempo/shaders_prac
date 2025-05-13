@@ -128,190 +128,175 @@ float fbm(vec3 p, float rate_mult) {
   return result;
 }
 
-vec3 getCellColor(int cellID, vec2 uv, vec3 t1, float p1) {
+vec3 getCellColor(int cellID, vec2 uv, vec2 uvP, vec3 t1, float p1) {
+    // Simplify time calculations - only use what's needed
+    float rateq = u_time * 0.25;
+    
+    // Safer mix value calculation
+    float mix_v = abs(log(max(t1.b * t1.r, 1.1)));
+    vec3 brightness = 0.75 + (0.13 * vec3(uv.y, uv.x, uv.y));
 
-    float rate = u_time * 1.0;
-  float rated = u_time * 2.0;
-  float rateh = u_time * .50;
-  float rateq = u_time * .25;
-
-
-  float mix_v = abs(log(max(t1.b * t1.r, 1.1)));
-  vec3 brightness = .75 + (.13 * vec3(uv.y, uv.x, uv.y));
-
-    vec3 cp1 = pal(
-	cnoise((uv * 1.2 + rateq)) + p1,
-	vec3(0.80, 0.50, 0.40),
-	vec3(0.20, 0.40, 0.20),
-	vec3(2.00, 1.00, 1.00),
-	vec3(0.50, 0.20, 0.25)
-  );
-
-  vec3 cp2 = pal(
-	cnoise((uv * 1.2 + rateq * .1)) + p1,
-	vec3(1.00, 0.97, 1.00),
-	vec3(0.30, 0.30, 0.50),
-	vec3(0.80, 0.80, 0.50),
-	vec3(0.10, 0.30, 0.70)
-  );
-
-  vec3 cp_gray = pal(
-  cnoise((uv * 1.2 + rateq * .1)) + p1,
-  vec3(1.00, 1.00, 1.00),
-	vec3(1.00, 1.00, 1.00),
-	vec3(2.00, 2.00, 2.00),
-	vec3(0.00, 1.00, 0.00)
-);
-
-  
+    // Base color palettes (declare up front)
+    vec3 cp1, cp2, c;
+    
+    // Cell-specific color definitions
     if (cellID == 0) {
-
-  cp1 = pal(
-	cnoise((uv * 1.2 + rateq)) + p1,
-	vec3(0.30, 0.30, 0.50),
-	vec3(0.30, 0.30, 0.50),
-	vec3(0.80, 0.80, 0.50),
-	vec3(0.10, 0.30, 0.70)
-);
-
- cp2 = pal(
-	cnoise((uv * 1.2 + rateq * .1)) + p1,
-	vec3(1.00, 1.00, 1.00),
-	vec3(1.00, 1.00, 1.00),
-	vec3(2.00, 2.00, 2.00),
-	vec3(0.1 - cos(rateq), 1.00, 0.01 - sin(rateq))
-);
-
-    return mix(cp2, cp1, mix_v) * brightness;
-  } else if (cellID == 1) {
-
-    cp1 = pal(
-	cnoise((uv * 1.2 + rateq)) + p1,
-	vec3(1.00, 1.00, 1.00),
-	vec3(1.00, 1.00, 1.00),
-	vec3(2.00, 2.00, 2.00),
-	vec3(0.01, 1.00, 0.00)
-);
-
-    cp2 = pal(
-	cnoise((uv * 1.2 + rateq * .1)) + p1,
-	vec3(0.50, 0.50, 0.50),
-	vec3(0.50, 0.50, 0.50),
-	vec3(1.00, 1.00, 1.00),
-	vec3(0.00, 0.33, 0.67)
-);
-
-    return mix(cp2, cp1, mix_v) * brightness;
-
-  } else if (cellID == 2) {
-
-    return mix(cp1, cp1, mix_v) * brightness;
-
-  } else if (cellID == 3) {
-
-    return mix(cp2, cp1, mix_v) * brightness;
-
-  } else if (cellID == 4) {
-
         cp1 = pal(
-	cnoise((uv * 1.2 + rateq)) + p1,
-	vec3(0.80, 0.50, 0.40),
-	vec3(0.20, 0.40, 0.20),
-	vec3(2.00, 1.00, 1.00),
-	vec3(0.50, 0.20, 0.25)
-);
+            cnoise((uv * 1.2 + rateq)) + p1,
+            vec3(0.30, 0.30, 0.50),
+            vec3(0.30, 0.30, 0.50),
+            vec3(0.80, 0.80, 0.50),
+            vec3(0.10, 0.30, 0.70)
+        );
 
- cp2 = pal(
-	cnoise((uv * 1.2 + rateq * .1)) + p1,
-	vec3(0.98, 0.95, 0.40),
-	vec3(0.20, 0.40, 0.20),
-	vec3(.50, .50, .50),
-	vec3(0.50, 0.20, 0.25)
-);
+        cp2 = pal(
+            cnoise((uv * 1.2 + rateq * 0.1)) + p1,
+            vec3(1.00, 1.00, 1.00),
+            vec3(1.00, 1.00, 1.00),
+            vec3(2.00, 2.00, 2.00),
+            vec3(0.1 - cos(rateq), 1.00, 0.01 - sin(rateq))
+        );
 
-    return mix(cp2, cp1, mix_v) * brightness;
-  } else {
-    brightness = .25 + (.13 * vec3(uv.y, uv.x, uv.y));
-    return mix(cp2 / cp1, cp1, mix_v) * brightness;
-  }
+        c = mix(cp2, cp1, mix_v) * brightness;
+
+    } else if (cellID == 1) {
+        cp1 = pal(
+            cnoise((uv * 1.2 + rateq)) + p1,
+            vec3(1.00, 1.00, 1.00),
+            vec3(1.00, 1.00, 1.00),
+            vec3(2.00, 2.00, 2.00),
+            vec3(0.01, 1.00, 0.00)
+        );
+
+        cp2 = pal(
+            cnoise((uv * 1.2 + rateq * 0.1)) + p1,
+            vec3(0.50, 0.50, 0.50),
+            vec3(0.50, 0.50, 0.50),
+            vec3(1.00, 1.00, 1.00),
+            vec3(0.00, 0.33, 0.67)
+        );
+
+        c = mix(cp2, cp1, mix_v) * brightness;
+
+    } else if (cellID == 2) {
+        // Fixed: Actually mix two different colors
+        cp1 = pal(
+            cnoise((uv * 1.2 + rateq)) + p1,
+            vec3(0.80, 0.50, 0.40),
+            vec3(0.20, 0.40, 0.20),
+            vec3(2.00, 1.00, 1.00),
+            vec3(0.50, 0.20, 0.25)
+        );
+
+        cp2 = pal(
+            cnoise((uv * 1.2 + rateq * 0.5)) + p1,
+            vec3(0.30, 0.60, 0.20),
+            vec3(0.20, 0.40, 0.20),
+            vec3(1.00, 1.00, 1.00),
+            vec3(0.20, 0.50, 0.30)
+        );
+
+        c = mix(cp1, cp2, mix_v) * brightness;
+
+    } else if (cellID == 3) {
+        cp1 = pal(
+            cnoise((uv * 1.2 + rateq)) + p1,
+            vec3(1.00, 0.97, 1.00),
+            vec3(0.30, 0.30, 0.50),
+            vec3(0.80, 0.80, 0.50),
+            vec3(0.10, 0.30, 0.70)
+        );
+
+        cp2 = pal(
+            cnoise((uv * 1.2 + rateq * 0.1)) + p1,
+            vec3(0.50, 0.50, 0.50),
+            vec3(0.50, 0.50, 0.50),
+            vec3(1.00, 1.00, 1.00),
+            vec3(0.00, 0.33, 0.67)
+        );
+
+        c = mix(cp2, cp1, mix_v) * brightness;
+
+    } else if (cellID == 4) {
+        cp1 = pal(
+            cnoise((uv * 1.2 + rateq)) + p1,
+            vec3(0.80, 0.50, 0.40),
+            vec3(0.20, 0.40, 0.20),
+            vec3(2.00, 1.00, 1.00),
+            vec3(0.50, 0.20, 0.25)
+        );
+
+        cp2 = pal(
+            cnoise((uv * 1.2 + rateq * 0.1)) + p1,
+            vec3(0.98, 0.95, 0.40),
+            vec3(0.20, 0.40, 0.20),
+            vec3(0.50, 0.50, 0.50),
+            vec3(0.50, 0.20, 0.25)
+        );
+
+        c = mix(cp2, cp1, mix_v) * brightness;
+
+    } else {  // cellID == 5
+        // Fixed: Remove color division which could cause NaN/Infinity
+        brightness = 0.25 + (0.13 * vec3(uv.y, uv.x, uv.y));
+        
+        cp1 = pal(
+            cnoise((uv * 1.2 + rateq)) + p1,
+            vec3(0.30, 0.30, 0.50),
+            vec3(0.30, 0.30, 0.50),
+            vec3(0.80, 0.80, 0.50),
+            vec3(0.10, 0.30, 0.70)
+        );
+
+        cp2 = pal(
+            cnoise((uv * 1.2 + rateq * 0.1)) + p1,
+            vec3(1.00, 1.00, 1.00),
+            vec3(1.00, 1.00, 1.00),
+            vec3(2.00, 2.00, 2.00),
+            vec3(0.00, 1.00, 0.50)
+        );
+
+        c = mix(cp2, cp1, mix_v) * brightness;
+    }
+
+    return c;
 }
 
 void main(){
-  float zoom = 1.0;
-  vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
-  //for textures, use below
-  // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
+    // Setup
+    float zoom = 1.0;
+    vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
+    vec3 t1 = texture2D(u_tex, uv).rgb;
 
-// to subdivide uv space
-  //uv = fract(uv * 2.0) - 0.5;
-  // init_easing for easing functions
-  float rate = u_time * 1.0;
-  float rated = u_time * 2.0;
-  float rateh = u_time * .50;
-  float rateq = u_time * .25;
+    float rateh = u_time * 0.5;
+    float rateq = u_time * 0.25;
+    
+    // Grid setup (3x2)
+    uv = uv * vec2(3.0, 2.0);
+    int cellX = int(floor(uv.x));
+    int cellY = int(floor(uv.y));
+    int cellID = cellX + cellY * 3;
+    vec2 uvC = fract(uv);
+    vec2 uvP = fract(uv * vec2(2., 3.));
 
-  // ??? HARD SPLIT 3x2
-  uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
-  // tiling (for noise texture)
-  vec3 t1 = texture2D(u_tex, uv).rgb;
-  uv = fract(uv * 1.) - 0.5;
-
-  float cellW = 1.0 / 3.0; // 3 columns
-  float cellH = 1.0 / 2.0; // 2 rows
-
-  // normalize uv to [0,1] for grid calculation
-  vec2 uvN = (uv + .5);
-
-  // calc grid indices
-  int cellX = int(floor(uvN.x / cellW));
-  int cellY = int(floor(uvN.y / cellH));
-  int cellID = cellX + cellY * 3;
-
-  // !!! here's where we smooth the split
-  vec2 uvC = vec2(
-    fract(uvN.x / cellW), fract(uvN.y / cellH)
-  );
-
-  // Blend factor: Smooth transition near edges (10% blend zone)
-  vec3 temp_c1 = vec3(uv.y*4., (rateq * .25) + uv.y*.34, uv.x*2.);
-  float temp_p1 = fbm(temp_c1, 0.01);
-
-float blendZone = 0.01; // Adjust blend zone size
-vec2 blendFactor = smoothstep(
-    vec2(0.0), 
-    vec2(blendZone), 
-    min(uvC, 1.0 - uvC)
-);
-
-// Global blend strength (how much cells bleed into each other)
-float globalBlend = 0.5;  // Adjust between 0 (hard edges) and 1 (fully blended)
-blendFactor = mix(vec2(0.0), blendFactor, globalBlend);
-// !!!! 
-
-  // * UV defaults (will vary in some cells)
-  vec3 c1 = vec3(uv.y*4., (rateq * .25) + uv.y*.34, uv.x*2.);
+      vec3 c1 = vec3(uv.y*4., (rateq * .25) + uv.y*.34, uv.x*2.);
   float p1 = fbm(c1, 0.01);
-
-
-  // Get base color for current cell
-vec3 c_center = getCellColor(cellID, uv, t1, p1);
-
-// Get color for right neighbor (if exists)
-vec3 c_right = (cellX < 1) ? getCellColor(cellID + 1, uv, t1, p1) : c_center;
-
-// Get color for top neighbor (if exists)
-vec3 c_top = (cellY < 1) ? getCellColor(cellID + 3, uv, t1, p1) : c_center;
-
-// Blend colors
-vec3 c_out = mix(
-    mix(c_center, c_right, blendFactor.x),
-    mix(c_top, getCellColor(cellID + 4, uv, t1, p1), blendFactor.x),
-    blendFactor.y
-);
-  
-
-  //glslViewer -l FILE.frag texture.png 
-  // or... glslViewer shader.frag textures/*
-  //FragColor = texture2D(u_tex, uv);
-  FragColor = vec4(c_out, 1.0);
+    
+    // Calculate blend factors
+    float blendZone = 0.1;
+    vec2 edgeDist = min(uvC, 1.0 - uvC);
+    vec2 blendFactor = smoothstep(vec2(0.0), vec2(blendZone), edgeDist);
+    
+    // Get colors for current and neighboring cells
+    vec3 c_center = getCellColor(cellID, uvC, uvP, t1, p1);
+    vec3 c_right = getCellColor((cellX + 1) % 3 + cellY * 3, uvC + vec2(1.0, 0.0), uvP, t1, p1);
+    vec3 c_top = getCellColor(cellX + ((cellY + 1) % 2) * 3, uvC + vec2(0.0, 1.0), uvP, t1, p1);
+    vec3 c_top_right = getCellColor((cellX + 1) % 3 + ((cellY + 1) % 2) * 3, uvC + vec2(1.0, 1.0), uvP, t1, p1);
+    
+    // Final blending (with explicit float conversion)
+    vec3 horizontal_blend = mix(c_center, c_right, blendFactor.x);
+    vec3 vertical_blend = mix(c_top, c_top_right, blendFactor.x);
+    vec3 final_color = mix(horizontal_blend, vertical_blend, blendFactor.y);
+    
+    FragColor = vec4(final_color, 1.0);
 }
