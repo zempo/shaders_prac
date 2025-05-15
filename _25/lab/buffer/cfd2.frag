@@ -9,8 +9,8 @@ precision mediump float;
 // 
 // https://www.shadertoy.com/view/MdKXRy
 
-uniform sampler2D   u_buffer0;
-uniform sampler2D   u_buffer1;
+uniform sampler2D u_buffer0;
+uniform sampler2D u_buffer1;
 uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec2 u_mouse;
@@ -20,8 +20,6 @@ out vec4 FragColor;
 const float PI = 3.1415926535897932384626433832795;
 const float TAU = PI * 2.;
 const float E = 2.71828182845904523536028747135266;
-
-#define ANGLES 5
 
 // http://dev.thi.ng/gradients/
 vec3 pal( float t, vec3 a, vec3 b, vec3 c, vec3 d) {
@@ -117,18 +115,20 @@ float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
 return 2.3 * n_xy;
 }
 
-vec2 cos_sin(float x) { return vec2(cos(x), sin(x)); }
-vec2 rot90(vec2 v) { return v.yx * vec2(1.0, -1.0); }
-
-float influence(vec2 uv, float sc) {
-    float acc = 0.0;
-    float angles = float(ANGLES);
-    for (int i = 0; i < ANGLES; i++) {
-        vec2 duv = cos_sin(TAU / angles * float(i)) * sc;
-        acc += dot(duv, texture2D(u_buffer1, uv + duv).xy - 0.5);
-    }
-    return acc / (sc * sc * angles);
+const float ANGLE = TAU / 5.0;
+// modified rotate
+mat2 rot(float angle){
+  return mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
 }
+
+float hash(float n) {return fract(sin(n) * 158.5453);}
+
+vec4 hashV4(float n) { return vec4(hash(seed),hash(seed+123.21),hash(seed+234.32),hash(seed+453.54)); }
+
+vec4 uvR(vec2 uv) {
+  return texture2D();
+}
+
 
 void main(){
   float zoom = 1.0;
@@ -151,33 +151,25 @@ void main(){
     //  Note: Here is where most of the action happens. But need's to read
     //  te content of the previous pass, for that we are making another buffer
     //  BUFFER_1 (u_buffer1)
-    const float delta = 1.0 / 180.0;
+    const float delta = .50 / 180.0;
     vec2 acc = vec2(0.0);
     float sc = delta;
 
     for(int i = 0; i < 5; i++) {
-        for(int j = 0; j < ANGLES; j++) {
-            vec2 duv = cos_sin(TAU / float(ANGLES) * float(j)) * sc;
+        for(int j = 0; j < 5; j++) {
+            vec2 duv = cos_sin(TAU / 5. * float(j)) * sc;
             acc += rot90(duv) * influence(uv + duv, sc);
         }
         sc *= 2.0;
     }
 
 
-    // FragColor = texture2D(u_buffer1, uv + acc * delta);
-    vec2 velocity = texture2D(u_buffer1, uv).xy * 0.99;
-    FragColor = vec4(velocity + acc * delta, 0.0, 1.0);
+    FragColor = texture2D(u_buffer1, uv + acc * delta);
 
-    // FragColor = vec4(uv + acc, 0.0, 1.0);
   #elif defined( BUFFER_1 )
 
-    FragColor = texture2D(u_buffer0, uv);
-    if (mod(u_time, 10.) < 1.) FragColor = texture2D(u_tex, uv);
   #else
 
-  //glslViewer -l FILE.frag texture.png 
-  // or... glslViewer shader.frag textures/*
-  //FragColor = texture2D(u_tex, uv);
   FragColor = texture2D(u_buffer1, uv);
 
   #endif
