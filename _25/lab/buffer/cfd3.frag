@@ -161,11 +161,11 @@ void main() {
         FragColor.xz += force;
     }
     
-        vec2 uvF = sin(u_frame * .1) + dot(u_mouse.x, u_mouse.y)/u_resolution;
+        vec2 uvF = dot(u_mouse.x, u_mouse.y)/u_resolution;
         float seg2 = 5.0 * (TAU + 6.0);
-        uvF *= modPolar((uvF * 1.0), seg2);
-        float dist = distance(uv, uvF);
-        vec2 force2 = normalize(uv - uvF) * 0.003/(0.1 + pow(dist, 2.));
+        uvC *= modPolar((uvC * 1.0), seg2);
+        float dist = distance(uv, uvC);
+        vec2 force2 = normalize(uv - uvC) * 0.002/(0.1 + pow(dist, 2.));
         FragColor.xy += force2;
         FragColor.yz += force2;
         FragColor.xz += force2;
@@ -194,15 +194,16 @@ void main() {
     vec3 fluidColor = vec3(0.5) + 0.5*cos(vec3(1.0,2.0,3.0)*vorticity*15.0 + u_time);
     
     // Combine with texture using vorticity as blend factor
-    float blendFactor = smoothstep(0.0, 0.5, vorticity);
-    vec3 finalColor = mix(texColor, fluidColor, blendFactor * 0.7);
-    // finalColor += mix(fluidColor, col, blendFactor * .7);
+    float blendFactor = smoothstep(0.0, 0.95, vorticity);
+    vec3 finalColor = mix(texColor, texColor, blendFactor * 0.07);
+    finalColor -= mix(fluidColor, texColor, blendFactor * .07);
+    finalColor += mix(fluidColor, texColor, blendFactor * .07);
     
     // Add velocity lines
     float velocityLines = 1.0 - smoothstep(0.0, 0.02, abs(dot(normalize(vel), normalize(uv - 0.5))));
     finalColor += velocityLines * 0.3 * vec3(1.0, 1.0, 0.5);
     
-    FragColor = vec4(finalColor, 1.0);
+    FragColor = vec4(finalColor, u_time);
     // FragColor = vec4(finalColor, .50);
 
     // vec3 col = vec3(0.5) + 0.5*sin(vec3(1.0,2.0,3.0)*vorticity*10.0);
