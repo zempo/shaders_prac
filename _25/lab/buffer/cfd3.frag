@@ -147,25 +147,25 @@ void main() {
     // Combine fluid with texture (weighted average)
     float p1 = 5.0 * (TAU + 6.0);
         // mouseUV *= modPolar((mouseUV * 1.0), seg);
-    FragColor = mix(fluid, texColor, p1 + mUV.x + mUV.y);
+    FragColor = mix(fluid, texColor, .3);
     
     // Add mouse interaction
     if (u_mouse.x > 0.0 && u_mouse.y > 0.0) {
         vec2 mouseUV = u_mouse/u_resolution;
         float seg = 5.0 * (TAU + 6.0);
         mouseUV *= modPolar((mouseUV * 1.0), seg);
-        float dist = distance(uvC, mouseUV);
+        float dist = distance(uv, mouseUV);
         vec2 force = normalize(uvC - mouseUV) * 0.001/(0.1 + dist*dist);
         FragColor.xy += force;
         FragColor.yz += force;
         FragColor.xz += force;
     }
     
-        vec2 uvF = sin(u_frame  * .1)/u_resolution;
+        vec2 uvF = sin(u_frame * .1) + dot(u_mouse.x, u_mouse.y)/u_resolution;
         float seg2 = 5.0 * (TAU + 6.0);
         uvF *= modPolar((uvF * 1.0), seg2);
         float dist = distance(uv, uvF);
-        vec2 force2 = normalize(uv - uvF) * 0.002/(0.1 + pow(dist, 2.));
+        vec2 force2 = normalize(uv - uvF) * 0.003/(0.1 + pow(dist, 2.));
         FragColor.xy += force2;
         FragColor.yz += force2;
         FragColor.xz += force2;
