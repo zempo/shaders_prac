@@ -149,12 +149,46 @@ vec4 snoise(vec3 v) {
 
 	// return vec4((wx * w)*cell_mult, (wy - w)*cell_mult, (wz / w)*cell_mult, w * 8.);
   // ?? electron microscope fibers
-  float cell_mult = 10.0;
-  float w_tmp1 = 42.0 * dot( m*m + (sin(u_time * .5) * m), vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+  // float cell_mult = 10.0;
+  // float w_tmp1 = 42.0 * dot( m*m + (sin(u_time * .5) * m), vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+
+	//   float wx_tmp = 42.0 * dot( mx*mx, vec4( dot(p0,x0+dx), dot(p1,x1+dx), dot(p2,x2+dx), dot(p3,x3+dx) ) );
+
+	// return vec4((wx * w)*cell_mult, (wy - w)*cell_mult, (wz / w)*cell_mult, w * 8.);
+  // ?? vascular
+//   float cell_mult = 100.0;
+//   float w_tmp1 = 42.0 * dot( m*m + abs(sin(u_time * .05) * m), vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+//   float w_tmp2 = 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+
+// 	  float wx_tmp = 42.0 * dot( mx*mx, vec4( dot(p0,x0+dx), dot(p1,x1+dx), dot(p2,x2+dx), dot(p3,x3+dx) ) );
+
+//     vec3 cp1 = pal(
+// 	w_tmp1,
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(0.80, 0.80, 0.50),
+// 	vec3(0.10, 0.30, 0.70)
+// );
+
+
+// 	return vec4((wx * cp1.r * w)*cell_mult, (wy - w + (.7*cp1.b))*cell_mult, (wz / w * cp1.b)*cell_mult, w * 4.);
+// ?? light at the end of the tunnel
+  float cell_mult = 500.0;
+  float w_tmp1 = 42.0 * dot( m*m + abs(sin(u_time * .05) * m), vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+  float w_tmp2 = 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
 
 	  float wx_tmp = 42.0 * dot( mx*mx, vec4( dot(p0,x0+dx), dot(p1,x1+dx), dot(p2,x2+dx), dot(p3,x3+dx) ) );
 
-	return vec4((wx * w)*cell_mult, (wy - w)*cell_mult, (wz / w)*cell_mult, w * 8.);
+    vec3 cp1 = pal(
+	wx,
+	vec3(0.30, 0.30, 0.50),
+	vec3(0.30, 0.30, 0.50),
+	vec3(0.80, 0.80, 0.50),
+	vec3(0.10, 0.30, 0.70)
+);
+
+
+	return vec4((wx - w - cp1.r)*cell_mult, (wy - w - cp1.g)*cell_mult, (wz - w - cp1.b)*cell_mult, w * 1.);
 }
 
 
