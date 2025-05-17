@@ -123,10 +123,55 @@ vec4 snoise(vec3 v) {
 	  mz = mz * mz;
 	  float wz = 42.0 * dot( mz*mz, vec4( dot(p0,x0+dz), dot(p1,x1+dz), dot(p2,x2+dz), dot(p3,x3+dz) ) );
 		  
-	return vec4((wx-w)*1000.0, (wy-w)*1000.0, (wz-w)*1000.0, w);
+  // ?? baseline 3d bulbs
+	// return vec4((wx-w)*1000.0, (wy-w)*1000.0, (wz-w)*1000.0, w);
+  // ?? cartoony bulbs
+	// return vec4((wx-w)*10.0, (wy-w)*10.0, (wz-w)*10.0, w);
+  // ?? microscopic (plasticy fibers)
+  // float w_tmp1 = 6. * 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+	// return vec4((wx-w)*100.0, (wy-w)*100.0, (wz-w)*100.0, w_tmp1);
+  // ?? shifting dimensions (lowered cell_mult for resolution)
+  // float cell_mult = 100.0;
+  // float w_tmp1 = 42.0 * dot( m*m + (sin(u_time * .5) * m), vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+	// return vec4((wx-w)*cell_mult, (wy-w)*cell_mult, (wz-w)*cell_mult, w_tmp1);
+  // ?? black and white
+  // float cell_mult = 100.0;
+  // float w_tmp1 = 42.0 * dot( m*m + (sin(u_time * .5) * m), vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+
+	//   float wx_tmp = 42.0 * dot( mx*mx, vec4( dot(p0,x0+dx), dot(p1,x1+dx), dot(p2,x2+dx), dot(p3,x3+dx) ) );
+
+	// return vec4((wx_tmp)*cell_mult, (wx_tmp)*cell_mult, (wx_tmp)*cell_mult, w);
+  // ?? electron microscope fibers
+  // float cell_mult = 10.0;
+  // float w_tmp1 = 42.0 * dot( m*m + (sin(u_time * .5) * m), vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+
+	//   float wx_tmp = 42.0 * dot( mx*mx, vec4( dot(p0,x0+dx), dot(p1,x1+dx), dot(p2,x2+dx), dot(p3,x3+dx) ) );
+
+	// return vec4((wx * w)*cell_mult, (wy - w)*cell_mult, (wz / w)*cell_mult, w * 8.);
+  // ?? electron microscope fibers
+  float cell_mult = 10.0;
+  float w_tmp1 = 42.0 * dot( m*m + (sin(u_time * .5) * m), vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+
+	  float wx_tmp = 42.0 * dot( mx*mx, vec4( dot(p0,x0+dx), dot(p1,x1+dx), dot(p2,x2+dx), dot(p3,x3+dx) ) );
+
+	return vec4((wx * w)*cell_mult, (wy - w)*cell_mult, (wz / w)*cell_mult, w * 8.);
 }
 
 
+const vec3 diffuse = vec3( .5, .75, 1. );
+const vec3 eps = vec3( .001, 0., 0. );
+const int iter = 100;
+
+vec4 c( vec3 p ) {
+  //  combined with scaled snoise by .5
+  
+  // *** radial falloff term (+ 1. prevents division by zero)
+  // *+ vec4(-2.0*p.x, -2.0*p.y, 0.0, 1.0)/(p.x*p.x+p.y*p.y+1.0)
+
+
+	vec4 v = snoise(p*0.5) + vec4(-2.0*p.x, -2.0*p.y, 0.0, 1.0)/(p.x*p.x+p.y*p.y+1.0);
+	return vec4(v.xyz, abs(v.w) + 0.01);
+}
 
 
 void main(){
@@ -135,15 +180,49 @@ void main(){
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
 
-// to subdivide uv space
-  //uv = fract(uv * 2.0) - 0.5;
-  // init_easing for easing functions
-  float rate = u_time * 1.0;
+    float rate = u_time * 1.0;
   float rated = u_time * 2.0;
   float rateh = u_time * .50;
   float rateq = u_time * .25;
+
+  float r = u_resolution.x / u_resolution.y;
+  // vec2 uv = gl_FragCoord.xy / u_resolution.xy * 2. - 1.;
+  // vec2 uvM = u_mouse-.5;
+  // uv.x *= r;
+  // uvM.x *= r;
+
+  vec2 uvM = (u_mouse.xy - (u_resolution.xy * 0.5)) / u_resolution.y * zoom;
+uvM.x *= r; // Aspect ratio correction
+
+vec3 o = vec3(0., 0., rate);  // Ray origin (animated along Z-axis)
+vec3 s = vec3(uvM, 0.);       // Scene focus point (mouse-driven)
+vec3 b = vec3(0., 0., 0.);    // Background color or unused placeholder
+vec3 d = vec3(uv, 1.) / 32.;  // Ray direction (normalized step)
+vec3 t = vec3(.5);            // Color accumulator or threshold
+vec3 a;                       // Uninitialized (likely for temporary calculations)
+
+vec3 light = o + vec3(0,0,2.5);
+
+for(float i = 0.0; i < iter; i++){
+		// vec3 v = b+s+o;
+		vec3 v = b+o;
+		vec4 hv = c(v);
+		float h = hv.w;
+		b += h * 6.0 * d;
+		float d = v.z*0.7;
+		float dist = dot(v-light, v-light);
+		float mx = min(dist, 1.0);
+		t += (pow(max(0.0,dot(normalize(reflect(light-v, normalize(hv.xyz))), normalize(b))), 34.0) + abs(dot(normalize(hv.xyz), light-v))*0.1 * (normalize(hv.xyz)+1.0)) * pow(h, -1.2) * 0.1 * (iter-i);
+	}
+	t = t / float(iter*iter);
+
+// to subdivide uv space
+  //uv = fract(uv * 2.0) - 0.5;
+  // init_easing for easing functions
+
+
   
-  vec3 c_out = vec3(1.0);
+  vec3 c_out = sqrt(t);
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
