@@ -173,7 +173,7 @@ vec4 snoise(vec3 v) {
 
 // 	return vec4((wx * cp1.r * w)*cell_mult, (wy - w + (.7*cp1.b))*cell_mult, (wz / w * cp1.b)*cell_mult, w * 4.);
 // ?? light at the end of the tunnel
-  float cell_mult = 500.0;
+  float cell_mult = 1000.0;
   float w_tmp1 = 42.0 * dot( m*m + abs(sin(u_time * .05) * m), vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
   float w_tmp2 = 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
 
@@ -185,7 +185,7 @@ vec4 snoise(vec3 v) {
 	vec3(0.30, 0.30, 0.50),
 	vec3(0.80, 0.80, 0.50),
 	vec3(0.10, 0.30, 0.70)
-);
+) * .015;
 
 
 	return vec4((wx - w - cp1.r)*cell_mult, (wy - w - cp1.g)*cell_mult, (wz - w - cp1.b)*cell_mult, w * 1.);
@@ -194,7 +194,7 @@ vec4 snoise(vec3 v) {
 
 const vec3 diffuse = vec3( .5, .75, 1. );
 const vec3 eps = vec3( .001, 0., 0. );
-const int iter = 100;
+const int iter = 120;
 
 vec4 c( vec3 p ) {
   //  combined with scaled snoise by .5
@@ -238,8 +238,8 @@ vec3 a;                       // Uninitialized (likely for temporary calculation
 vec3 light = o + vec3(0,0,2.5);
 
 for(float i = 0.0; i < iter; i++){
-		// vec3 v = b+s+o;
-		vec3 v = b+o;
+		vec3 v = b+s+o; // camera follows
+		// vec3 v = b+o; //  no camera / debug
 		vec4 hv = c(v);
 		float h = hv.w;
 		b += h * 6.0 * d;
