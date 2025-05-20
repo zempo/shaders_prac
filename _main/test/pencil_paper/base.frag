@@ -106,12 +106,13 @@ float teardropSDF(vec2 uv) {
 void main() {
     float zoom = 1.0;
     vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
+    vec2 uvM = zoom * ((u_mouse - (u_resolution.xy * 0.5)) / u_resolution.y);
 
     // Read previous pencil trail
     float previous = texture(u_buffer1, uv).r;
 
     // ?? circle pen Distance from mouse 
-    float dist = length(uv - u_mouse / u_resolution);
+    float dist = length(uv - uvM);
     float stroke = smoothstep(u_pencilStroke, 0., dist);  // soft round brush
 
         // Add pencil texture and pressure variation
