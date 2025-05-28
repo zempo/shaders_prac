@@ -119,45 +119,9 @@ void main(){
   // c1 = mix(c1, vec3(.001), clamp(min(geo_0, c2), 0., 1.));
 
   // ?? PERM 1: four seasons
-//   // float geo_0 = min(length(qv-vec2(-.5, .5))-.5, length(qv-vec2(.5, -.5))-.5);
-//   // ??? gPERM2: flowers (max instead of min)
-//   float geo_0 = max(length(qv-vec2(-.5 + cos(rateh), .5 / tan(rateh)))-.5, length(qv-vec2(.5, -.5))-.5);
-//   float geo_1 = abs(geo_0) - .5;
- 
-// //  ! smoothstep(-px, px >> smoothstep(px, -px
-//   float c2 = smoothstep(px, -px,abs(abs(geo_0)-.125)-.125);
-  
-//   geo_0 = (rand>.5^^chk>.5) ? smoothstep(px, -px, geo_0) : smoothstep(-px, px, geo_0);
-//   geo_1 = smoothstep(.125, -px, geo_1);
-
-//   dv = fract(dv * zoom) - .5;
-
-//   float dots = min(length(abs(dv) - vec2(0., .5))-.25, length(abs(dv) - vec2(.5, 0.))-.5);
-
-// //  ! moving subdots
-//   dots = abs(abs(abs(abs(dots) - (.1 * sin(rate))) - .05) - .025) - .0125;
-//   dots = smoothstep(-px, px, dots);
-
-//   float hs = hash_a(vuv)*.25;
-
-//   c1 = clamp(hue_mod(52.+id.x)+hs, c1, vec3(1.0));
-
-//   c1 = mix(c1, c1 * .75, dots);
-//   c1 = mix(c1, c1 * .75, geo_1);
-
-//   vec3 cp1 = pal(
-// 	dots,
-// 	vec3(0.17 - cos(rate), 0.62, 0.11),
-// 	vec3(0.30, 0.30, 0.50),
-// 	vec3(0.80, 0.80, 0.50),
-// 	vec3(0.10, 0.30, 0.70)
-// );
-//   c1 = mix(c1, cp1, clamp(min(geo_0, c2), 0.25, 1.));
-
-  // ?? PERM 2: sandstone
   // float geo_0 = min(length(qv-vec2(-.5, .5))-.5, length(qv-vec2(.5, -.5))-.5);
   // ??? gPERM2: flowers (max instead of min)
-  float geo_0 = min(length(qv-vec2(-.5 + cos(rateh), .5 / atan(rateh)))-.5, length(qv-vec2(.5, -.5 / sin(rate)))-.5);
+  float geo_0 = max(length(qv-vec2(-.5 + cos(rateh), .5 / tan(rateh)))-.5, length(qv-vec2(.5, -.5))-.5);
   float geo_1 = abs(geo_0) - .5;
  
 //  ! smoothstep(-px, px >> smoothstep(px, -px
@@ -182,11 +146,11 @@ void main(){
   c1 = mix(c1, c1 * .75, geo_1);
 
   vec3 cp1 = pal(
-	geo_1 + c1.r,
-	vec3(0.92, 1.00, 1.00),
-	vec3(1.00, 1.00, 1.00),
-	vec3(2.00, 2.00, 2.00),
-	vec3(0.48, 0.70, 0.00)
+	dots,
+	vec3(0.17 - cos(rate), 0.62, 0.11),
+	vec3(0.30, 0.30, 0.50),
+	vec3(0.80, 0.80, 0.50),
+	vec3(0.10, 0.30, 0.70)
 );
   c1 = mix(c1, cp1, clamp(min(geo_0, c2), 0.25, 1.));
   
