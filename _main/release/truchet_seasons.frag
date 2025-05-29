@@ -155,6 +155,7 @@ void main(){
   c1 = mix(c1, cp1, clamp(min(geo_0, c2), 0.25, 1.));
   
   vec3 c_out = pow(c1, vec3(.4545));
+
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
