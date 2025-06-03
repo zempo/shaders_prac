@@ -64,8 +64,15 @@ void main(){
   vec2 cell_origin = fract(cell_size); // grid relative UV
 
   vec2 uv_cell = floor(uv_g / uv * atan(uv_g.y) / cell_size); // grid UV space for color
-
-  float angle = getFieldAngle(uv_cell);
+  
+  // ?? MOD 1
+  // float angle = getFieldAngle(uv_cell); // get the angle based on UV cell
+  // float angle = getFieldAngle(uv_cell / SUBDIV); // get the angle based on UV cell
+  // float z = dot(min(sin(uv.x * 3.) - cos(uv.y * 4.),.01) * uv.x, uv_g.y);
+  // float z = dot(min(sin(uv.x * .01) - cos(uv.y * .01) + sin(rateq * uv.x * .1),.01) * uv.x, uv_g.y);
+  // float z = dot(min(sin(uv.x * .01) - cos(uv.y * .01) + sin(rateq * uv.y * uv.x * .1),.01) * uv.x, uv_g.y);
+  float z = dot(min(sin(uv.x * .01) + cos(uv.y * .01) + sin(rateq * uv.y * uv.x * .1),.01) * uv.x, uv_g.y);
+  float angle = getFieldAngle(uv_cell / SUBDIV - (50. * z)); // get the angle based on UV cell
 
   vec2 dir = vec2(cos(angle), sin(angle)); // direction vector based on angle
 
@@ -82,22 +89,46 @@ void main(){
   float grid = min(step(.98,fract(uv_cell.x / cell_size.x)),
   step(.98,fract(uv_cell.y / cell_size.y))); // grid lines 
 
-  float p_1 = length(uv) + (dot(uv_g, px_pos) * .00005);
+  float p_1 = length(uv) + (dot(uv_g, px_pos) * .000015);
   // float p_1 = length(uv) * exp(-length(uv_reset)) - p_1b;
   float freq = 8.0;
-  p_1 = sin((p_1 * freq) - rate) / freq;
+  p_1 = sin(log(p_1 * freq) - rateh) / freq;
   p_1 = abs(p_1);
   p_1 = 0.01 / p_1;
 
+  // ?? 	p_1 * 20. + cos(rate * .05) * 10.,
+  // ?? 	p_1 * z,
+  // ?? 	p_1 / z,
+	// ?? p_1 * 20. + cos(rate / z) * 10.,
+	// ?? HALO RINGS pow(p_1, .01) * 20. + cos(rate / z) * .1,
   vec3 cp1 = pal(
-	p_1 * SUBDIV,
+	pow(p_1, 1.01) * 20. + cos(rateh / z ) * .1,
 	vec3(1.00, 1.00, 1.00),
 	vec3(1.00, 1.00, 1.00),
-	vec3(1.,1., 1.),
-	vec3(0.15, 1.00, 0.00)
+	vec3(1.,1., 1. + cos(rateq * .05) * 1.),
+	vec3(0.15, 1.00, 0.00 - sin(rate * .15) * 0.1)
+) * .5;
+//   vec3 cp1 = pal(
+// 	pow(p_1, 1.01) * 20. + cos(rateh / z ) * .1,
+// 	vec3(0.92, 1.00, 1.00),
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(2.00, 2.00, 2.00),
+// 	vec3(0.48, 0.70, 0.00)
+// ) * .5;
+
+vec3 cp2 = pal(
+	z,
+	vec3(0.50, 0.50, 0.50),
+	vec3(0.50, 0.50, 0.50),
+	vec3(1.00, 1.00, 1.00),
+	vec3(0.00, 0.33, 0.67)
 );
  
- vec3 c1 = mix(vec3(.2), cp1, smoothstep(PI / 2., .2, dir.x + dist));
+//  vec3 c1 = mix(vec3(.2) + cp2, cp1, smoothstep(PI / 2., .2, dir.y + dist));
+ vec3 c1 = mix(vec3(.2) + cp2, cp1, smoothstep(PI / 2., .2, dir.x + dir.y + dist));
+ c1 *= cp1 / cp2;
+ c1 -= dist;
+ c1 += grid;
 //  c1 = mix(vec3(.2), cp1, smoothstep(TAU / 2., 1.2, dir.y * dist));
  
   vec3 c_out = c1; // color based on grid UV
