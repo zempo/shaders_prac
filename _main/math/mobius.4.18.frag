@@ -45,9 +45,9 @@ void main(){
 float v = uv.y * mob - 1.0;  
 
 vec3 mobius = vec3(  
-    cos(u) + v * cos(u/mob) * cos(u),  
-    sin(u) + v * cos(u/mob) * sin(u),  
-    v * sin(u/mob)  
+    cos(u) + v * cos(u/mob) * cos(u) * sin(rate * .25),  
+    sin(u) + v * cos(u/mob) * sin(u) * sin(rate * .25),  
+    v * sin(u/mob)
 );  
 
 // Fake lighting with dot product  

@@ -127,7 +127,7 @@ void main(){
   // * CALC
   float GOLDEN_ANGLE = TAU / GOLDEN_RATIO;
   float rad = length(uv);
-  float angle = atan(uv.y, uv.x);
+  float angle = atan(uv.x, uv.y);
 
   // * GOLDEN SPIRAL
   float spiralFactor = .5;
@@ -138,6 +138,54 @@ void main(){
 
   vec2 uvGold = vec2(cos(newAngle) * newRad, sin(newAngle) * newRad);
 
+
+  // ?? perm 0: Starting star
+
+  vec3 cp1 = pal(
+	smoothstep(-2.5, 2.5, cnoise(vec2(uvGold.x * 4., rateq * .13 + (u_mouse.x *.001)))) + uv.y,
+	vec3(0.92, 1.00, 1.00),
+	vec3(1.00, 1.00, 1.00),
+	vec3(2.00, 2.00, 2.00),
+	vec3(0.48, 0.70, 0.00)
+  ) * pal(
+    uvGold.x,
+    	vec3(1.00, 1.00, 1.00),
+	vec3(1.00, 1.00, 1.00),
+	vec3(2.00, 2.00, 2.00),
+	vec3(0.00, 1.00, 0.00)
+  );
+
+      vec3 cG = vec3(
+        0.37 + 0.3 * cos(uvGold.x * 1.0),
+        0.5 + 0.3 * cos(uvGold.y * 1.0 + PI/2.0),
+        0.3 + 0.3 * sin((uvGold.x + uvGold.y) * 1.0)
+    );
+
+    //   vec3 cG = vec3(
+    //     0.37 + 0.3 * cos(uvGold.x * 1.0),
+    //     0.5 + 0.3 * cos(uvGold.y * 1.0 + PI/2.0),
+    //     0.3 + 0.3 * sin((uvGold.x + uvGold.y) * 5.0)
+    // );
+
+    // vec3 cG = vec3(
+    //   0.37 + 0.3 * cos(uvGold.x * 10.0)
+    // );
+    // vec3 cG = vec3(
+    //  uvGold.x * 10.,uvGold.y * 10.,uvGold.x * 10. + uvGold.y * 10.
+    // );
+    // vec3 cG = vec3(
+    //  uvGold.x * 10. + sin(rateq * uvGold.x * 10.),
+    //  uvGold.y * 2. + sin(rateq * uvGold.y * 10.),
+    //  uvGold.x * 3. + uvGold.y * 10. + sin(rateq * (uvGold.x + uvGold.y) * 10.)
+    // );
+    
+
+  cp1 *= 1. - smoothstep(.8,1.5, newRad);
+
+  
+  // vec3 c_out = cG + .92 * cp1;
+  // vec3 c_out = cp1;
+  vec3 c_out = cG;
 
   // ?? perm 1: Y2k
 
@@ -201,33 +249,35 @@ void main(){
   
   // ?? perm 3: tie dye
 
-  vec3 cp1 = pal(
-	smoothstep(-2.5, 2.5, cnoise(vec2(uvGold.x * 4., rateq * .13 + (u_mouse.x *.001)))) + uv.y,
-	vec3(1.00, 0.30, 0.50),
-	vec3(0.30, 0.30, 0.50),
-	vec3(2.00, 0.97, 0.59),
-	vec3(0.10, 0.30, 0.70)
-  ) * pal(
-    uvGold.x,
-	vec3(1.00, 0.30, 0.50),
-	vec3(0.30, 0.30, 0.50),
-	vec3(2.00, 0.97, 0.59),
-	vec3(0.10, 0.30, 0.70)
-  );
+  // vec3 cp1 = pal(
+	// smoothstep(-2.5, 2.5, cnoise(vec2(uvGold.x * 4., rateq * .13 + (u_mouse.x *.001)))) + uv.y,
+	// vec3(1.00, 0.30, 0.50),
+	// vec3(0.30, 0.30, 0.50),
+	// vec3(2.00, 0.97, 0.59),
+	// vec3(0.10, 0.30, 0.70)
+  // ) * pal(
+  //   uvGold.x,
+	// vec3(1.00, 0.30, 0.50),
+	// vec3(0.30, 0.30, 0.50),
+	// vec3(2.00, 0.97, 0.59),
+	// vec3(0.10, 0.30, 0.70)
+  // );
 
-      vec3 cG = vec3(
-        0.7 + 0.3 * cos(uvGold.x * 10.0),
-        0.5 + 0.3 * cos(uvGold.y * 10.0 + PI/2.0),
-        0.3 + 0.3 * sin((uvGold.x + uvGold.y) * 5.0)
-    );
+  //     vec3 cG = vec3(
+  //       0.7 + 0.3 * cos(uvGold.x * 10.0),
+  //       0.5 + 0.3 * cos(uvGold.y * 10.0 + PI/2.0),
+  //       0.3 + 0.3 * sin((uvGold.x + uvGold.y) * 5.0)
+  //   );
     
 
-  cp1 *= 1. - smoothstep(.8,1.5, newRad);
+  // cp1 *= 1. - smoothstep(.8,1.5, newRad);
 
   
   // vec3 c_out = cG + .92 * cp1;
   // vec3 c_out = cp1;
-  vec3 c_out = pow(cp1,cG) + .12 * pow(cG,cp1) + (sin(cG) * (.4 * cnoise(vec2(uvGold.x * 10., rateq * .13 + (u_mouse.x *.001)))));
+  // vec3 c_out = pow(cp1,cG);
+  // vec3 c_out = pow(cp1,cG) + .12 * pow(cG,cp1) + (sin(cG) * (.4 * cnoise(vec2(uvGold.x * 10., rateq * .13 + (u_mouse.x *.001)))));
+  // vec3 c_out = pow(cp1,cG) + .12 * pow(cG,cp1) + (sin(cG) * (.4 * cnoise(vec2(uvGold.x * 10., rateq * .13 + (u_mouse.x *.001)))));
 
 
   //glslViewer -l FILE.frag texture.png 
