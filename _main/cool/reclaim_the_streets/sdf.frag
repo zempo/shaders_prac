@@ -143,13 +143,20 @@ void main(){
 
   // * GOLDEN SPIRAL
   float spiralFactor = 1. - (.5 * sin(rateq));
-  float newRad = rad * (1. + spiralFactor * sin(angle * 5. - log(rad) * GOLDEN_ANGLE));
+  float newRad = rad * (1. + spiralFactor * sin(angle * 5. - (log(rad) * GOLDEN_ANGLE)));
 
   // * remape angle from golden ratio
   float newAngle = angle + rateh + log(newRad + .1) * GOLDEN_ANGLE;
 
   vec2 uvGold = vec2(cos(newAngle) * newRad, sin(newAngle) * newRad);
 
+  float angle_2 = atan(uvGold.y, uv.x);
+  float spiralFactor2 = 1.;
+  float newAngle_2 = (.5 * rateq) + min(log(newRad + .05),.1) * GOLDEN_ANGLE;
+  float newRad_2 = rad * (1. + spiralFactor2 * cos(angle_2 * 4. + min(log(rad) * GOLDEN_ANGLE,.5)));
+
+  vec2 uvGold2 = vec2(cos(newAngle_2) * newRad_2, sin(newAngle_2) * newRad_2);
+  // uvGold2 *= vec2(sin(newAngle_2) * newRad_2, cos(newAngle_2) * newRad_2);
 
   // signed dist fxn  (base, vec3(x, y, ?))
   float bx_w = .25;
@@ -169,8 +176,15 @@ void main(){
   float stroke_lag = 2.1;
   float p8 = cos(sin(abs(p7) * stroke_lag / p6));
 
+  vec2 uv9 = uv *3.;
+  float p9 = bo_sdf(vec3((fract(uv9 * pow(uvGold.x, 3.))), uv.y),vec3(bx_w, bx_h, 1.));
+  float p10 = bo_sdf(vec3((fract(uv9 * pow(uvGold.y, 3.))), uv.x),vec3(bx_w, bx_h, 1.));
 
-
+  float freq11_1 = 10.0;
+  float p11_1 = max(abs(fract(uvGold2.x * freq11_1) * 2.0 - 1.0), abs(fract(uvGold2.y * freq11_1) * 2.0 - 1.0));
+  p11_1 = step(.2, p11_1);
+  // step(0.3, p2);
+  float p11 = bo_sdf(vec3(fract(uvGold2 * p11_1), p11_1),vec3(bx_w, bx_h, 1.));
 
   vec3 c1 = vec3(1. - sin(pow(p1, p2)));
   vec3 c2 = vec3(p3 / p2) + vec3(p1) + vec3(p1 - p3, sin(p2), .91);
@@ -218,14 +232,47 @@ void main(){
   // *biolumenescence
   vec3 c11 = mix(c8, c9, p3)/c4*sin(rateq)+.1;
 
-  int len = 11;
+  vec3 c12 = pal(
+	(p10 * p9 + cnoise(uv * sqrt(abs(p10 * dot(p6, p3))))) * 1.,
+	vec3(0.75, 0.50, 0.75),
+	vec3(.50, .50, .50),
+	vec3(2.00, 0.98, 2.00),
+	vec3(0.00, 0.33, 0.67)
+  );
+
+  vec3 c13 = pal(
+	(p10 * p9 + cnoise(uv * sqrt(abs(p10 * dot(p6, p3) * dot(p2, p4))))) * .5,
+	vec3(0.75, 0.50, 0.75),
+	vec3(.50, .50, .50),
+	vec3(2.00, 0.98, 2.00),
+	vec3(0.00, 0.33, 0.67)
+  );
+
+  vec3 c14 = pal(
+	(p10 * p9 + cnoise(uv * sqrt(abs(p10 * dot(p6, p3) * dot(p2, p4))))) * .5,
+	vec3(0.75, 0.50, 0.75),
+	vec3(.50, .50, .50),
+	vec3(2.00, 0.98, 2.00),
+	vec3(0.00, 0.33, 0.67)
+  );
+
+vec3 c15 = pal(
+	p11,
+	vec3(0.96, 0.96, 0.93),
+	vec3(0.33, 0.31, 0.36),
+	vec3(2.00, 2.00, 1.99),
+	vec3(0.11, 0.13, 0.15)
+) * .75 + (c14/30.);
+
+  int len = 13;
   // TODO: replace c1,c2 with cooler colors
-  vec3 aEx[11] = vec3[11](
-    c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11
+  vec3 aEx[13] = vec3[13](
+    c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13
   );
   int aEx_idx = int(mod(rateh, float(len))); // Modulo cycles between 0, 1, 2...etc over time
   vec3 c_out = aEx[int(aEx_idx)];
-  // c_out = c11;
+  // c_out = vec3(p11);
+  c_out = c15;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
