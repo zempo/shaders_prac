@@ -158,6 +158,25 @@ void main(){
   vec2 uvGold2 = vec2(cos(newAngle_2) * newRad_2, sin(newAngle_2) * newRad_2);
   // uvGold2 *= vec2(sin(newAngle_2) * newRad_2, cos(newAngle_2) * newRad_2);
 
+  float tEase = smoothstep(0.0, 1.0, 0.5 + 0.5 * sin(rateq)); 
+// spiral factor smoothed
+float spiralFactor_3 = mix(0.8, 1.2, tEase); 
+float newRad_3 = rad * (1. + spiralFactor_3 * sin(angle * 5. - log(rad + 1e-3) * GOLDEN_ANGLE));
+
+// eased angle offset
+float newAngle_3 = angle + rateh + log(newRad_3 + .1) * GOLDEN_ANGLE * tEase;
+
+vec2 uvGold3 = vec2(cos(newAngle_3) * newRad_3, sin(newAngle_3) * newRad_3);
+
+// second spiral eased
+float angle_4 = atan(uvGold3.y, uvGold3.x);
+float spiralFactor_4 = mix(0.9, 1.1, tEase); 
+
+float newAngle_4 = 0.5 * rateq + min(log(newRad_3 + .05), 0.1) * GOLDEN_ANGLE * tEase;
+float newRad_4   = rad * (1. + spiralFactor_4 * cos(angle_4 * 4. + min(log(rad) * GOLDEN_ANGLE, .5)));
+
+vec2 uvGold4 = vec2(cos(newAngle_4) * newRad_4, sin(newAngle_4) * newRad_4);
+
   // signed dist fxn  (base, vec3(x, y, ?))
   float bx_w = .25;
   float bx_h = .35;
@@ -264,15 +283,54 @@ vec3 c15 = pal(
 	vec3(0.11, 0.13, 0.15)
 ) * .75 + (c14/30.);
 
-  int len = 13;
+  // *crazy partterns
+  vec2 uv_grid = fract(uv * 6.)-.5;
+  float pc1 = bo_sdf(vec3(uv_grid, 0.),vec3(bx_w * 1.25, bx_h, 1.)); // *bars
+
+  // float line(float x, float y, float line_width, float edge_width)
+  float l2x = line(uv_grid.y * PI,cos(uv_grid.x * PI * 10. + rateh),.02,.1);
+  float l2y = line(uv_grid.x * PI,sin(uv_grid.y * PI * 10. + (rate)),.2,.1);
+  float pc2 = bo_sdf(vec3(uv_grid, 0.),vec3(vec2(l2x, l2y * bx_h), 1.)); // *zig-zag cubicles
+
+  float pc3 = bo_sdf(vec3(vec2(l2x, l2y), 0.),vec3(vec2(-l2x, -l2y), 1.)); // *darker squiggles
+
+  vec2 uv_pc4 = uv - .5;
+    float pc4 = bo_sdf(vec3(uv_grid, 0.),vec3(uv_grid.x * cos(uv_grid.y * 75.+(rated))*.1, uv_grid.y * cos(uv_grid.x * 30.+(rated * 3.))*.1, 1.)); // * gear baseline
+
+  float pc5 = bo_sdf(vec3(uv_grid, 0.),vec3(uv_grid.x * cos(uv_grid.y * 75.+(rated))*.1, uv_grid.y * cos(uv_grid.x * 30.+(rated * 3.))*.1, cnoise(uvGold*1.151 + uv_grid * 3. + rate + (uv_grid.x * cos(uv_grid.y * 75.+(rated))*.1)))); // *gear noise
+  // pc1 = smoothstep(sin(uv_grid.x * sin(rated)), sin(uv_grid.y * cos(rated)), pc1);
+  // pc1 = smoothstep(sin(uv_grid.x * sin(rated)), sin(uv_grid.y * cos(rated)), pc1);
+
+  vec2 uv_w3 = vec2(
+    uv.x + cos(uv.y * 120.0 + (rated * 2.)) * 0.1,
+    uv.y + sin(uv.x * 100.0 + (rated * 2.)) * 0.1
+  );
+  
+  vec2 uv_grid_gold = fract(uv * 6.)-.5;
+  uv_grid_gold += fract(uv_w3 * uv_grid);
+  float pc6 = bo_sdf(vec3(uv_grid_gold, 0.),vec3(bx_w * 1.25, bx_h, 1.)); // *warble
+   vec2 uv_grid_gold2 = fract(uv * 6.)-.5;
+  uv_grid_gold2 += fract(uv_w3 * uv_grid + uvGold2*.2);
+
+  float pc7 = bo_sdf(vec3(uv_grid_gold2, 0.),vec3(bx_w * 1.25, bx_h, 1.)); // *golden+warble
+
+vec3 c22 = pal(
+	pc7,
+	vec3(0.96, 0.96, 0.93),
+	vec3(0.33, 0.31, 0.36),
+	vec3(2.00, 2.00, 1.99),
+	vec3(0.11, 0.13, 0.15)
+) * .75 + (c14/30.);
+
+  int len = 15;
   // TODO: replace c1,c2 with cooler colors
-  vec3 aEx[13] = vec3[13](
-    c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13
+  vec3 aEx[15] = vec3[15](
+    c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15
   );
   int aEx_idx = int(mod(rateh, float(len))); // Modulo cycles between 0, 1, 2...etc over time
   vec3 c_out = aEx[int(aEx_idx)];
   // c_out = vec3(p11);
-  c_out = c15;
+  c_out = c22;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
