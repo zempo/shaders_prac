@@ -314,23 +314,79 @@ vec3 c15 = pal(
 
   float pc7 = bo_sdf(vec3(uv_grid_gold2, 0.),vec3(bx_w * 1.25, bx_h, 1.)); // *golden+warble
 
-vec3 c22 = pal(
-	pc7,
+// vec3 c16 = pal(
+// 	pc1,
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(2.00, 2.00, 2.00),
+// 	vec3(0.15, 1.00, 0.00)
+// );
+
+vec3 c16 = pal(
+	pc1 / pc2,
+	vec3(1.00, 0.32, 0.00),
+	vec3(0.58, 0.53, 0.00),
+	vec3(0.95, 0.95, 0.00),
+	vec3(0.15, 0.15, 0.00)
+);
+
+vec3 c17 = pal(
+	pc2 + pc1,
+	vec3(0.88, 0.35, 0.89),
+	vec3(0.50, 0.50, 0.50),
+	vec3(1.00, 1.00, 1.00),
+	vec3(0.00, 0.33, 0.67)
+) * .75 + (c14/30.);
+
+vec3 c18 = pal(
+	pc3 + pc2 + p1/pc1,
 	vec3(0.96, 0.96, 0.93),
 	vec3(0.33, 0.31, 0.36),
 	vec3(2.00, 2.00, 1.99),
 	vec3(0.11, 0.13, 0.15)
 ) * .75 + (c14/30.);
 
-  int len = 15;
+vec3 c19 = pal(
+	pc4,
+	vec3(0.48, 0.48, 0.48),
+	vec3(0.29, 0.29, 0.29),
+	vec3(1.02, 0.93, 1.01),
+	vec3(0.00, 1.00, 0.00)
+) + (c4/30.);
+
+vec3 c20 = pal(
+	pc5 / c4.g * .52,
+	vec3(0.48, 0.48, 0.48),
+	vec3(0.29, 0.29, 0.29),
+	vec3(1.02, 0.93, 1.01),
+	vec3(0.00, 1.00, 0.00)
+) + (c4/30.);
+
+vec3 c21 = pal(
+	pc5 * pc6,
+	vec3(0.48, 0.48, 0.68),
+	vec3(0.29, 0.29, 0.29),
+	vec3(1.02, 0.93, 1.01),
+	vec3(0.00, 1.00, 0.00)
+) + (c14/30.);
+
+vec3 c22 = pal(
+	pc7,
+	vec3(0.57, 0.59, 0.68),
+	vec3(0.42, 0.39, 0.24),
+	vec3(1.02, 0.93, 1.01),
+	vec3(0.00, 1.00, 0.00)
+) * .75 + (c14/30.);
+
+  int len = 22;
   // TODO: replace c1,c2 with cooler colors
-  vec3 aEx[15] = vec3[15](
-    c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15
+  vec3 aEx[22] = vec3[22](
+    c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20,c21,c22
   );
   int aEx_idx = int(mod(rateh, float(len))); // Modulo cycles between 0, 1, 2...etc over time
   vec3 c_out = aEx[int(aEx_idx)];
   // c_out = vec3(p11);
-  c_out = c22;
+  // c_out = c22;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
