@@ -110,23 +110,118 @@ float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
 return 2.3 * n_xy;
 }
 
-// *****************************************************************************
+// ***************************************************
+// float t,tt,b,bb,g,a,la;vec2 z,v,e=vec2(.00035,-.00035);vec3 pp,op,cp,po,no,al,ld;
+// vec4 np; 
+const vec3 e = vec3(0.00035, -0.00035, 0.0);
+mat2 r2(float r){return mat2(cos(r),sin(r),-sin(r),cos(r));}
+float bo(vec3 p,vec3 r){p=abs(p)-r;return max(max(p.x,p.y),p.z);}
 
-// ?? box signed distance function (SDF).
-float bo_sdf(vec3 p,vec3 r){
-  vec3 p_dist = abs(p)-r;
-  return max(max(p_dist.x,p_dist.y),p_dist.z);
+float tt=mod(u_time,62.82)+8.;
+float bb=1.-ceil(sin(tt*.4));
+
+float b;
+float g;
+vec3 op;
+vec3 cp;
+vec3 pp;
+vec3 po;
+vec3 no;
+vec3 al;
+// vec3 ld;
+vec4 np; 
+vec2 h;
+vec2 t;
+vec2 z;
+
+vec2 fb(vec3 p,float i,float s) {
+  vec2 t=vec2(length(p.xz)-2.-clamp(sin(p.y*5.),-.2,.2)*.2,5);
+  t.x=abs(t.x)-.2;
+
+  pp = p;
+  pp.y+=1.-float(i)*2.;
+
+  float a=max(abs(bo(pp,vec3(.65,2,200)))-.2,abs(pp.y)-1.);
+  t.x=min(t.x,mix(a,length(pp.xy-sin(p.z*.5))-.5,b));
+  pp.x=mix(abs(pp.x)-0.7,pp.y*.5-.8,b);//lampposts
+  pp.z=mod(pp.z,3.)-1.5;
+  pp-=mix(vec3(0,1.,.0),vec3(0.,-1.3,0.)+sin(p.z*.5),b);        
+  t.x=min(t.x,bo(pp,vec3(.1,2.,.1))); 
+  pp.y-=2.;     //lamps 
+
+  float la =length(pp)-.1;
+    g+=0.1/(0.1+la*la*40.);
+    t.x=min(t.x,la);
+    t.x/=s;    
+    t.x=max(t.x,-(length(op.xy-vec2(-2.*b,6.-float(i)*.1))-5.));
+    t.x=max(t.x,(abs(op.y)-5.+float(i))); 
+    h=vec2(length(p.xz)-1.+(pp.y*.1/float(i*2.+1.)),3); //black
+    h.x/=s;
+    h.x=max(h.x,-(length(op.xy-vec2(0,6.1+3.*b-float(i)*.1))-5.));    
+    h.x=max(h.x,(abs(op.y)-5.5-5.*b+float(i)));
+    t=t.x<h.x?t:h;
+    if(i<2.){
+        h=vec2(abs(length(p.xz)-1.2)-.1,6);
+        h.x/=s;    
+        h.x=max(h.x,-(length(op.xy-vec2(-1.*b,6.2-float(i)*.1))-5.));    
+        h.x=max(h.x,(abs(op.y)-6.+float(i)));        
+        t=t.x<h.x?t:h;
+    }   
+  return t; 
 }
 
-// *****************************************************************************
+vec2 mp( vec3 p,float ga) {
+  p.yz *= r2(mix(-.785,-.6154,bb));
+  p.xz *= r2(mix(0.,.785,bb));
+  op = p;
+  b = clamp(cos(op.z*.1+tt*.4),-.25,.25)*2.+.5;
+  p.z = mod(p.z-tt,10.) - 5.0;
+
+  vec2 local_best = vec2(1000.0);
+  np = vec4(p,1.0);
+  for (int i = 0; i < 5; i++) {
+    np.xz = abs(np.xz) - 2.1 + sin(np.y * .5) * .5 * b;
+    np.xz *= r2(-.785);
+    np *= 2.1;
+    vec2 local_h = fb(np.xyz, float(i), np.w);
+    local_h.x *= 0.75;
+    local_best = (local_best.x < local_h.x) ? local_best : local_h;
+  }
+
+  vec2 ground = vec2(p.y + 2.0 + 3.0 * cos(p.x * .35), 6.0);
+  ground.x = max(ground.x, p.y);
+  ground.x *= 0.5;
+  local_best = (local_best.x < ground.x) ? local_best : ground;
+
+  cp = p;
+  return local_best;
+}
 
 //varying vec2 vUv;
 
+vec2 tr( vec3 ro, vec3 rd, int it) {
+  vec2 trace_res = vec2(-3.0);
+  for (int i = 0; i < it; i++) {
+    vec2 hvec = mp(ro + rd * trace_res.x, 1.0);
+    if (hvec.x < 0.0001 || trace_res.x > 17.0) break;
+    trace_res.x += hvec.x;
+    trace_res.y = hvec.y;
+  }
+  if (trace_res.x > 17.0) trace_res.y = 0.0;
+  return trace_res;
+}
+
+#define a(d) clamp(mp(po+no*d,0.).x/d,0.,1.)
+#define s(d) smoothstep(0.,1.,mp(po+ld*d,0.).x/d)
 void main(){
   float zoom = 1.0;
   vec2 uv = zoom * ((gl_FragCoord.xy - (u_resolution.xy * 0.5)) / u_resolution.y);
   //for textures, use below
   // vec2 uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
+
+  vec3 ro=vec3(uv*8.,-8.),
+  rd=vec3(0.,0.,1.),co,fo;
+  co=fo=vec3(.13,.1,.12)-length(uv)*.12;
 
 // to subdivide uv space
   //uv = fract(uv * 2.0) - 0.5;
@@ -136,37 +231,32 @@ void main(){
   float rateh = u_time * .50;
   float rateq = u_time * .25;
 
+  vec3 ld = normalize(vec3(-.5,.5,-.3));
+  vec2 z = tr(ro, rd, 128);
+  float tDist = z.x;
 
-  // * signed dist fxn  (base, vec3(x, y, ?))
-  float bx_w = .25;
-  float bx_h = .35;
-  float p1 = bo_sdf(vec3(uv, 0.),vec3(bx_w, bx_h, 1.));
-  p1 = smoothstep(-.1, .1, p1);
-  float p2 = cos(sin(abs(p1) * 100.));
-  float p3 = sin(exp(-40. * abs(p1)) * 100);
-  float p4 = cos(sin(abs(p1) * 100.));
+  if (z.y > 0.0) {
+    po = ro + rd * tDist;
 
-
-  vec3 c1 = vec3(1. - sin(pow(p1, p2)));
-  vec3 c2 = vec3(p3 / p2) + vec3(p1) + vec3(p1 - p3, sin(p2), .91);
-  vec3 cp1 = pal(
-	p2 + p4 - cnoise(fract(uv * 5.3 + rateq)),
-	vec3(1.00, 1.00, 1.00),
-	vec3(1.00, 1.00, 1.00),
-	vec3(2.00, 2.00, 2.00),
-	vec3(0.15, 1.00, 0.00)
-  );
-  vec3 c3 = cp1;
-
-  int len = 3;
-  vec3 aEx[3] = vec3[3](
-    c1,c2,c3
-  );
-  int aEx_idx = int(mod(rateh, float(len))); // Modulo cycles between 0, 1, 2...etc over time
-  vec3 c_out = aEx[int(aEx_idx)];
-  c_out = c3;
+    vec2 d0 = mp(po + e.xyy, 0.0);
+    vec2 d1 = mp(po + e.yyx, 0.0);
+    vec2 d2 = mp(po + e.yxy, 0.0);
+    vec2 d3 = mp(po + e.xxx, 0.0);
+    no = normalize(e.xyy * d0.x + e.yyx * d1.x + e.yxy * d2.x + e.xxx * d3.x);
+    al=mix(vec3(.0,.1,.3),vec3(0.4,0.3,0.1),b);
+    if(z.y<5.) al=vec3(0);
+    if(z.y>5.) al=vec3(1),no-=0.2*ceil(abs(cos((cp)*5.2))-.05),no=normalize(no);    
+    float dif=max(0.,dot(no,ld)),
+    fr=pow(1.+dot(no,rd),4.),
+    sp=pow(max(dot(reflect(-ld,no),-rd),0.),40.);
+    co=mix(sp+al*(a(0.05)+.2)*(dif+s(.5)),fo,min(fr,.5));
+    co=mix(fo,co,exp(-.001*tDist*tDist*tDist));
+  }
+  co=mix(co,co.xzy,length(uv*.7));  
+  // vec3 c_out = pow(co+g*.2*mix(vec3(1.,.5,0.),vec3(1.),sin(tDist*5.)*.5-.2),vec3(.45));
+  vec3 c_out = pow(co+g*.2*mix(vec3(1.,.5*cos(rateh),0.),vec3(1.),sin(tDist*5.)*.5-.2),vec3(.45));
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
   FragColor = vec4(c_out, 1.0);
-}
+} 
