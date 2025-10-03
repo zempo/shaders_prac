@@ -140,13 +140,20 @@ vec2 fb(vec3 p,float i,float s) {
 
   pp = p;
   pp.y+=1.-float(i)*2.;
-
-  float a=max(abs(bo(pp,vec3(.65,2,200)))-.2,abs(pp.y)-1.);
+  // *** straight pipes
+  float a=max(abs(bo(pp,vec3(.65,2.,200.)))-.2,abs(pp.y)-.5);
   t.x=min(t.x,mix(a,length(pp.xy-sin(p.z*.5))-.5,b));
+  // ?? base shape: abs(bo(pp,vec3(.65,2.,200.)))-.2 
+  // ?? pipe height abs(pp.y)-1. >>
+  // ********* 
+
   pp.x=mix(abs(pp.x)-0.7,pp.y*.5-.8,b);//lampposts
   pp.z=mod(pp.z,3.)-1.5;
+
+  // *** organic pipes
   pp-=mix(vec3(0,1.,.0),vec3(0.,-1.3,0.)+sin(p.z*.5),b);        
   t.x=min(t.x,bo(pp,vec3(.1,2.,.1))); 
+  // *****8
   pp.y-=2.;     //lamps 
 
   float la =length(pp)-.1;
