@@ -139,15 +139,28 @@ vec2 fb(vec3 p,float i,float s) {
   t.x=abs(t.x)-.2;
 
   pp = p;
+  // pp.y+=1.-float(i)*2.;
   pp.y+=1.-float(i)*2.;
-
-  float a=max(abs(bo(pp,vec3(.65,2,200)))-.2,abs(pp.y)-1.);
+  // *** straight pipes
+  float a=max(abs(bo(pp,vec3(.65,2.,200.)))-.2,abs(pp.y)-.5);
   t.x=min(t.x,mix(a,length(pp.xy-sin(p.z*.5))-.5,b));
+  // float a=max(abs(bo(pp,vec3(.65,2.,200.)))-.2,abs(pp.y)-.5);
+  // t.x=min(t.x,mix(a,length(pp.xy-sin(p.z*.5))-.5,b));
+  // ?? base shape: abs(bo(pp,vec3(.65,2.,200.)))-.2 
+  // ?? pipe height abs(pp.y)-1. >>
+  // ********* 
+
   pp.x=mix(abs(pp.x)-0.7,pp.y*.5-.8,b);//lampposts
   pp.z=mod(pp.z,3.)-1.5;
-  pp-=mix(vec3(0,1.,0),vec3(0.,-1.3,0.)+sin(p.z*.5),b);        
+
+  // *** organic pipes
+  pp-=mix(vec3(0,1.,.0),vec3(0.,-1.3,0.)+sin(p.z*.5),b);        
   t.x=min(t.x,bo(pp,vec3(.1,2.,.1))); 
+  // *****8
   pp.y-=2.;     //lamps 
+
+  float zoom_ind = 5.;
+  float zoom_org = 5.5 - 5.;
 
   float la =length(pp)-.1;
     g+=0.1/(0.1+la*la*40.);
@@ -155,6 +168,7 @@ vec2 fb(vec3 p,float i,float s) {
     t.x/=s;    
     t.x=max(t.x,-(length(op.xy-vec2(-2.*b,6.-float(i)*.1))-5.));
     t.x=max(t.x,(abs(op.y)-5.+float(i))); 
+    // !! black plumes
     h=vec2(length(p.xz)-1.+(pp.y*.1/float(i*2.+1.)),3); //black
     h.x/=s;
     h.x=max(h.x,-(length(op.xy-vec2(0,6.1+3.*b-float(i)*.1))-5.));    
@@ -178,13 +192,16 @@ vec2 mp( vec3 p,float ga) {
   p.z = mod(p.z-tt,10.) - 5.0;
 
   vec2 local_best = vec2(1000.0);
-  np = vec4(p,1.0);
+  np = vec4(p,1.0); // !!! path
   for (int i = 0; i < 5; i++) {
     np.xz = abs(np.xz) - 2.1 + sin(np.y * .5) * .5 * b;
     np.xz *= r2(-.785);
     np *= 2.1;
+    // np.xz = abs(np.xz) - 2.1 + sin(np.y * .5) * .5 * b;
+    // np.xz *= r2(-.785);
+    // np *= 2.1;
     vec2 local_h = fb(np.xyz, float(i), np.w);
-    local_h.x *= 0.75;
+    local_h.x *= 0.85;
     local_best = (local_best.x < local_h.x) ? local_best : local_h;
   }
 
@@ -253,7 +270,8 @@ void main(){
     co=mix(fo,co,exp(-.001*tDist*tDist*tDist));
   }
   co=mix(co,co.xzy,length(uv*.7));  
-  vec3 c_out = pow(co+g*.2*mix(vec3(1.,.5,0.),vec3(1.),sin(tDist*5.)*.5-.2),vec3(.45));
+  // vec3 c_out = pow(co+g*.2*mix(vec3(1.,.5,0.),vec3(1.),sin(tDist*5.)*.5-.2),vec3(.45));
+  vec3 c_out = pow(co+g*.2*mix(vec3(1.5,clamp(.5-b,-.5,.5),.3*sin(rated)),vec3(1.),sin(tDist*5.)*.5-.2),vec3(.5+clamp(b,-.3,.15)));
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
