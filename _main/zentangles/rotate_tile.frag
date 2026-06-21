@@ -218,11 +218,13 @@ c_init = mix(c_init, 1.0 - c_init, max(posBand, negBand));
   // ??? minutemaid
   // vec3 c_out = vec3(c_init.r, c_init.g, c_init.b) * vec3(exp(E) / uv.x, uv.y, uv.x * log(uv.x / uv.y));
   // ??? LASER criss cross (use uv with the .5 offset)
-  // vec3 c_out = vec3(c_init.r, c_init.g, c_init.b) * (vec3(uv.x / uv.y, sin(rate) * (uv.x / uv.y), .5) * .1);
+  vec3 c_out1 = vec3(c_init.r, c_init.g, c_init.b) * (vec3(uv.x / uv.y, sin(rate) * (uv.x / uv.y), .5) * .1);
   // ??? color spectrum
   vec3 cp1 = c_palette(sin(uv.y + uv.x * rate) + c_init.r, vec3(1., 0.5, 0.), vec3(0., 1., 0.), vec3(0., 0., 1.), vec3(1., 0., 0.)) * vec3(c_init.r, c_init.g, c_init.b);
+  vec3 cp2 = c_palette(cos(uv.x - uv.y * rate) + c_init.r, vec3(1., 0.5, 0.), vec3(0., 1., 0.), vec3(0., 0., 1.), vec3(1., 0., 0.)) * vec3(c_init.r, c_init.g, c_init.b);
 
-  vec3 c_out = cp1;
+  // vec3 c_out = mix(cos(sin(cp1 + c_out1)),cp2,fract(uv.x*1.21));
+  vec3 c_out = mix((sin(cp1 + cp2 )),cp2,fract(uv.x*1.21));
 
 
   //glslViewer -l FILE.frag texture.png 

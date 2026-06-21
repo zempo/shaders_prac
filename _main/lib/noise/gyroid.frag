@@ -250,36 +250,36 @@ void main(){
 //   vec3 c_out = mix(cp2, cp1 + cp2, abs(log(p1 * p1)));
 
 //  ??? PERM 4: ink clouds  glslViewer -l _25/lab/noise/gyroid.frag noise.png
-// vec3 t1 = texture2D(u_tex1, uv).rgb;
+vec3 t1 = texture2D(u_tex1, uv).rgb;
 
-// float scale = 100.;
-//   float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
-//   float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
-// float threshold = 0.5;
-// float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
-// float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
+float scale = 100.;
+  float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
+  float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
+float threshold = 0.5;
+float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
+float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
 
-// vec3 c1 = vec3(uv.y*7., (rateq * .25), uv.x*2.);
-// float p1 = fbm(c1, 0.01);
+vec3 c1 = vec3(uv.y*7., (rateq * .25), uv.x*2.);
+float p1 = fbm(c1, 0.01);
   
-// vec3 cp1 = pal(
-// 	p1,
-// 	vec3(1.00, 1.00, 1.00),
-// 	vec3(1.00, 1.00, 1.00),
-// 	vec3(0.87, 0.87, 0.87),
-// 	vec3(0.00, 1.00, 0.00)
-// );
+vec3 cp1 = pal(
+	p1,
+	vec3(1.00, 1.00, 1.00),
+	vec3(1.00, 1.00, 1.00),
+	vec3(0.87, 0.87, 0.87),
+	vec3(0.00, 1.00, 0.00)
+);
 
-// vec3 cp2 = pal(
-// 	cnoise((uv * 1.2 + rateq)) + p1,
-// 	vec3(1.00, 1.00, 1.00),
-// 	vec3(1.00, 1.00, 1.00),
-// 	vec3(1.00, 1.00, 1.00),
-// 	vec3(0.00, 1.00, 0.00)
-// );
+vec3 cp2 = pal(
+	cnoise((uv * 1.2 + rateq)) + p1,
+	vec3(1.00, 1.00, 1.00),
+	vec3(1.00, 1.00, 1.00),
+	vec3(1.00, 1.00, 1.00),
+	vec3(0.00, 1.00, 0.00)
+);
 
-//   float brightness = 0.65;
-//   vec3 c_out = mix(cp2, cp1, abs(log(max(t1.b * t1.r,1.1)))) * brightness;
+  float brightness = 0.65;
+  vec3 c_out = mix(cp2, cp1, abs(log(max(t1.b * t1.r,1.1)))) * brightness;
 
 //  ??? PERM 4: heat map clouds  glslViewer -l _25/lab/noise/gyroid.frag noise.png
 // vec3 t1 = texture2D(u_tex1, uv).rgb;
@@ -476,50 +476,50 @@ void main(){
 //   vec3 c_out = mix(cp2, cp1, abs(log(max(t1.b * t1.r,1.1)))) * brightness;
 
 //  ??? PERM 9: dark blue  glslViewer -l _25/lab/noise/gyroid.frag noise.png
-uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
-vec3 t1 = texture2D(u_tex1, uv).rgb;
+// uv = zoom * (gl_FragCoord.xy / u_resolution.xy);
+// vec3 t1 = texture2D(u_tex1, uv).rgb;
 
-uv = fract(uv * vec2(1., 1.)) - 0.5;
+// uv = fract(uv * vec2(1., 1.)) - 0.5;
 
-float scale = 100.;
-  float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
-  float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
-float threshold = 0.5;
-float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
-float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
+// float scale = 100.;
+//   float d = gyroid(vec3(uv.x * scale,log(max(uv.y * scale,10.1)),rate * uv.x)); // Scale adjusts the frequency
+//   float d2 = gyroid(vec3(uv.y * scale,log(max(uv.x * scale,10.1)),rate * uv.y)); // Scale adjusts the frequency
+// float threshold = 0.5;
+// float material = smoothstep(threshold - 0.1, threshold + 0.1, d);
+// float material2 = smoothstep(threshold - 0.1, threshold + 0.1, d2);
 
-vec3 c1 = vec3(uv.y*4., (rateq * .25) + uv.y*.34, uv.x*1.9);
-  // coswarp(c1, .70 + (.25 * sin(rateq)));
+// vec3 c1 = vec3(uv.y*4., (rateq * .25) + uv.y*.34, uv.x*1.9);
+//   // coswarp(c1, .70 + (.25 * sin(rateq)));
 
-float p1 = fbm(c1, 0.01);
+// float p1 = fbm(c1, 0.01);
 
   
-vec3 cp1 = pal(
-	cnoise((uv * 1.2 + rateq)) + p1,
-	vec3(1.00, 1.00, 1.00),
-	vec3(1.00, 1.00, 1.00),
-	vec3(2.00, 2.00, 2.00),
-	vec3(0.0, 1.00, 0.00)
-);
+// vec3 cp1 = pal(
+// 	cnoise((uv * 1.2 + rateq)) + p1,
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(2.00, 2.00, 2.00),
+// 	vec3(0.0, 1.00, 0.00)
+// );
 
-vec3 cp2 = pal(
-	cnoise((uv * 1.2 + rateq * .1)) + p1,
-	vec3(1.00, 0.97, 1.00),
-	vec3(0.30, 0.30, 0.50),
-	vec3(0.80, 0.80, 0.50),
-	vec3(0.10, 0.30, 0.70)
-);
+// vec3 cp2 = pal(
+// 	cnoise((uv * 1.2 + rateq * .1)) + p1,
+// 	vec3(1.00, 0.97, 1.00),
+// 	vec3(0.30, 0.30, 0.50),
+// 	vec3(0.80, 0.80, 0.50),
+// 	vec3(0.10, 0.30, 0.70)
+// );
 
-vec3 cp3 = pal(
-  cnoise((uv * 1.2 + rateq * .1)) + p1,
-  	vec3(1.00, 1.00, 1.00),
-	vec3(1.00, 1.00, 1.00),
-	vec3(2.00, 2.00, 2.00),
-	vec3(0.00, 1.00, 0.00)
-);
+// vec3 cp3 = pal(
+//   cnoise((uv * 1.2 + rateq * .1)) + p1,
+//   	vec3(1.00, 1.00, 1.00),
+// 	vec3(1.00, 1.00, 1.00),
+// 	vec3(2.00, 2.00, 2.00),
+// 	vec3(0.00, 1.00, 0.00)
+// );
 
-  vec3 brightness = .5 + (.13 * vec3(uv.y, uv.x, uv.y));
-  vec3 c_out = mix(cp2, cp1, abs(log(max(t1.b * t1.r,1.1)))) * brightness;
+//   vec3 brightness = .5 + (.13 * vec3(uv.y, uv.x, uv.y));
+//   vec3 c_out = mix(cp2, cp1, abs(log(max(t1.b * t1.r,1.1)))) * brightness;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   // FragColor = texture2D(u_tex, uv);

@@ -153,12 +153,12 @@ vec3 bgColor = vec3(
 );
 
 // vec3 cmix = mix(cp1,cp2,p2 - p1);
-vec3 cmix = mix(cp1 * cp2,c2,p2 - p1);
+vec3 cmix = mix(cp1 * cp2,c2,p2 + p1);
 // Final blend (preserve original colors where bright)
 float preserveOriginal = smoothstep(0.3, 0.5, length(cmix));
 vec3 finalOutput = mix(bgColor, cmix, preserveOriginal * (1.0 - quadrantFactor));
 
-  vec3 c_out = cmix ;
+  vec3 c_out = cmix;
   //glslViewer -l FILE.frag texture.png 
   // or... glslViewer shader.frag textures/*
   //FragColor = texture2D(u_tex, uv);
