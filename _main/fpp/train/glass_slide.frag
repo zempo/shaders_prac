@@ -218,9 +218,7 @@ void main(){
 	// vec3(1.12, 0.84, 2.00),
 	// vec3(0.34, 0.33, 0.32)
   // );
- 
-// ?? usage: vec3 uv_c1 = vec3(uv, 0.0) * vec3(rate);
-// ?? usage: coswarp(uv_c1, 3.0);
+
  vec3 c_uv1 = vec3(-uv.y, .2, uv_sub1.y);
   // coswarp(c_uv1, 4.0);
   vec3 cm1 = mix(cp1, cp2, p1);
